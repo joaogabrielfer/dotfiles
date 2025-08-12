@@ -1,0 +1,5 @@
+connect.mdns_devices="[]"
+connect.dial_devices="[{\"address\":\"192.168.15.8\",\"app_state\":\"MISSING\",\"created_timestamp\":1753898281,\"device_id\":\"cb43c717-4a3f-4f07-b8e7-43784a215098\",\"dial_location_url\":\"http://192.168.15.8:7678/nservice/\",\"display_name\":\"[TV] Samsung 6 Series (55)\",\"last_seen\":1753898295,\"manufacturer\":\"Samsung Electronics\",\"model_name\":\"UN55KU6000\",\"product_cap\":\"Resolution:1920X1080,Tizen,Y2016\",\"public_ip\":\"2804:1b2:2300:3cea:da5e:d3ff:feab:4784\",\"wol\":{\"all_interfaces\":false,\"delay_ms\":250,\"mac\":\"40163b7f3caa\",\"port\":9,\"retries\":80}}]"
+audio.play_bitrate_non_metered_migrated=true
+ui.hide_hpto=true
+app.player.volume=56374
