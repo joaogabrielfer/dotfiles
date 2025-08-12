@@ -51,3 +51,7 @@ export EDITOR="nvim"
 alias ls='ls --color=auto'
 alias la='ls -lha --color=auto'
 alias szsh='source ~/.config/zsh/.zshrc'
+
+alias ~='cd ~'
+alias ..='cd ..'
+alias ...='cd ../..'
