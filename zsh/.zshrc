@@ -30,6 +30,7 @@ export HYPRSHOT_DIR="$HOME/Pictures/screenshots"
 export MANPAGER="nvim +Man!"
 export EDITOR="nvim"
 
+export PATH=$PATH:$HOME/go/bin
 
  nvim() {
     if [ "$#" -eq 1 ] && [ -d "$1" ] && [ "$1" != "." ]; then

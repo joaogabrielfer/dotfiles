@@ -1,6 +1,6 @@
 theme = 0x96f
 shell-integration = zsh
-command = zsh
+command = ~/.config/scripts/tmux/tmux-launcher.sh
 background-opacity = 0.8
 
 font-family = "JetBrains Mono Nerd Font"
