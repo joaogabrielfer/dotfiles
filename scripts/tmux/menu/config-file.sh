@@ -4,9 +4,7 @@ if ! command -v fzf &> /dev/null; then
     exit 1
 fi
 declare -A SEARCH_PATHS=(
-    ["$HOME/Personal/"]="6"
-    ["$HOME/"]="1"
-    ["$HOME/.config"]="3"
+    ["$HOME/.config"]="6"
 )
 
 find_cmds=()
@@ -24,7 +22,7 @@ selected_name=$(basename "$selected_file" | tr . _)
 if [[ -n "$selected_file" ]]; then
     if [[ -n $TMUX ]]; then
 	cd $(dirname $selected_file)
-	tmux new-window -n "neovim" "nvim $selected_file" 
+	tmux new-window -n "config" "cd $selected_file;nvim $selected_file" 
     else
 	if ! tmux has-session -t="$selected_name" 2>/dev/null; then
 	    tmux new-session -ds "$selected_name" "nvim $selected_file"

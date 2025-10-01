@@ -40,7 +40,9 @@ return {
           "clangd",
           "cssls",
           "html",
-          "arduino_language_server"
+          "arduino_language_server",
+          "gopls",
+          "hyprls",
         },
         automatic_installation = true, -- Instala automaticamente se não estiver presente
       })
@@ -55,24 +57,21 @@ return {
       for server, config in pairs(opts.servers) do
         -- Adicionar keybinds on_attach se não existir
         if not config.on_attach then
-          config.on_attach = function(client, bufnr)
-            -- Suas keybinds existentes
+          config.on_attach = function(_, bufnr)
             vim.keymap.set("n", "<leader><Tab>", vim.lsp.buf.hover, { buffer = bufnr, desc = "LSP: Hover" })
             vim.keymap.set("n", "<leader>i", function()
               vim.diagnostic.open_float({ border = "rounded" })
             end, { buffer = bufnr, desc = "LSP: Diagnostic Float" })
 
-            -- Keybinds adicionais úteis
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr, desc = "LSP: Go to Definition" })
-            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = bufnr, desc = "LSP: Go to Declaration" })
-            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = bufnr, desc = "LSP: Go to Implementation" })
-            vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = bufnr, desc = "LSP: Go to References" })
-            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = bufnr, desc = "LSP: Rename" })
-            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = bufnr, desc = "LSP: Code Action" })
-            vim.keymap.set("n", "<leader>f", function() vim.lsp.buf.format({ async = true }) end,
-              { buffer = bufnr, desc = "LSP: Format" })
-            vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { buffer = bufnr, desc = "LSP: Previous Diagnostic" })
-            vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { buffer = bufnr, desc = "LSP: Next Diagnostic" })
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, "LSP: Go to Definition")
+            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, "LSP: Go to Declaration")
+            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, "LSP: Go to Implementation")
+            vim.keymap.set("n", "gr", vim.lsp.buf.references, "LSP: Go to References")
+            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename(), "LSP: Rename")
+            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, "LSP: Code Action")
+            vim.keymap.set("n", "<leader>b", function() vim.lsp.buf.format({ async = true }) end, "LSP: Format")
+            vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, "LSP: Previous Diagnostic")
+            vim.keymap.set("n", "]d", vim.diagnostic.goto_next, "LSP: Next Diagnostic")
           end
         end
 

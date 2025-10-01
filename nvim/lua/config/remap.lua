@@ -14,15 +14,8 @@ vim.keymap.set("n", "<leader>x", ":.lua<CR>", { desc = "Execute current line as 
 vim.keymap.set("v", "<leader>x", ":lua<CR>", { desc = "Execute selection as Lua" })
 vim.keymap.set("n", "<leader><leader>x", "<cmd>source %<CR>", { desc = "Source current file" })
 
--- Copy pwd
-vim.keymap.set('n', '<leader>[', function()
-  local current_dir = vim.fn.getcwd()
-  vim.fn.setreg('+', current_dir)
-  vim.notify("Copied PWD: " .. current_dir)
-end, { desc = "Copy current working directory" })
-
 -- Save
-vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
+vim.keymap.set("n", "<leader>w", "<cmd>w!<CR>", { desc = "Save file" })
 
 -- Quit
 vim.keymap.set("n", "<leader>q", "<C-w>q", { desc = "Close current window" })
@@ -51,67 +44,42 @@ vim.keymap.set("v", "<leader>p", "\"_dP", { desc = "Paste without yanking" })
 vim.keymap.set("n", "<leader>d", "\"_d", { desc = "Delete to void register" })
 vim.keymap.set("v", "<leader>d", "\"_d", { desc = "Delete selection to void register" })
 
--- LSP
-vim.keymap.set("n", "<leader><Tab>", vim.lsp.buf.hover, opts)
-vim.keymap.set("n", "<leader>i", function()
-  vim.diagnostic.open_float({
-    border = "rounded",
-  })
-end, { desc = "Show diagnostic float" })
--- ================================
--- ADICIONAIS ÚTEIS
--- ================================
+-- Telescope
+vim.keymap.set("n", "<leader>f", require("telescope.builtin").find_files)
+vim.keymap.set("n", "<leader>gg", require("telescope.builtin").live_grep)
+vim.keymap.set("n", "<leader>h", require("telescope.builtin").help_tags)
+vim.keymap.set("n", "<leader>en", function()
+  require("telescope.builtin").find_files {
+    cwd = vim.fn.stdpath("config")
+  }
+end)
+vim.keymap.set("n", "<leader>ep", function()
+  require("telescope.builtin").find_files {
+    cwd = vim.fs.joinpath(vim.fn.stdpath("data"), "lazy")
+  }
+end)
+
+-- Chmod
+vim.keymap.set("n", "<leader>c", "<cmd>!chmod +x %<CR>", { silent = true })
 
 -- Better indenting in visual mode
 vim.keymap.set("v", "<", "<gv", { desc = "Indent left and reselect" })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right and reselect" })
 
 -- Clear search highlights
-  vim.keymap.set("n", "<leader>/", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
+vim.keymap.set("n", "<leader>/", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 
+-- LSP
+vim.keymap.set("n", "<leader><Tab>", vim.lsp.buf.hover)
+vim.keymap.set("n", "<leader>i", function()
+  vim.diagnostic.open_float({ border = "rounded" })
+end)
 
-
--- ================================
--- LSP KEYBINDS COMPLETAS
--- ================================
-
--- Define função para keybinds do LSP
-local function setup_lsp_keymaps(bufnr)
-  local function map(mode, lhs, rhs, desc)
-    vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-  end
-
-  -- Suas existentes
-  map("n", "<leader><Tab>", vim.lsp.buf.hover, "LSP: Hover Documentation")
-  map("n", "<leader>i", vim.diagnostic.open_float, "LSP: Show Diagnostic")
-
-  -- Adicionais úteis
-  map("n", "gd", vim.lsp.buf.definition, "LSP: Go to Definition")
-  map("n", "gD", vim.lsp.buf.declaration, "LSP: Go to Declaration")
-  map("n", "gi", vim.lsp.buf.implementation, "LSP: Go to Implementation")
-  map("n", "gr", vim.lsp.buf.references, "LSP: Go to References")
-  map("n", "<leader>rn", vim.lsp.buf.rename, "LSP: Rename")
-  map("n", "<leader>ca", vim.lsp.buf.code_action, "LSP: Code Action")
-  map("n", "<leader>f", function() vim.lsp.buf.format({ async = true }) end, "LSP: Format")
-  map("n", "[d", vim.diagnostic.goto_prev, "LSP: Previous Diagnostic")
-  map("n", "]d", vim.diagnostic.goto_next, "LSP: Next Diagnostic")
-end
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "cpp",
-  callback = function()
-    vim.keymap.set('n', '<F5>', function()
-      vim.cmd('silent !cd build && cmake --build . --config Release')
-      vim.cmd('redraw!')
-    end, { desc = 'Build project', buffer = true })
-
-    vim.keymap.set('n', '<F6>', function()
-      vim.cmd('silent !cd build && ./Release/LearnOpenGL.exe')
-      vim.cmd('redraw!')
-    end, { desc = 'Run project', buffer = true })
-  end,
-})-- Exportar função para usar no setup do LSP
-return {
-  setup_lsp_keymaps = setup_lsp_keymaps
-}
+vim.keymap.set("n", "gd", "<cmd>vim.lsp.buf.definition()<CR>")
+vim.keymap.set("n", "gD", "<cmd>vim.lsp.buf.declaration()<CR>")
+vim.keymap.set("n", "gi", "<cmd>vim.lsp.buf.implementation()<CR>")
+vim.keymap.set("n", "gr", "<cmd>vim.lsp.buf.references()<CR>")
+vim.keymap.set("n", "<leader>ca", "<cmd>vim.lsp.buf.code_action()<CR>")
+vim.keymap.set("n", "<leader>b", function() vim.lsp.buf.format({ async = true }) end)
+vim.keymap.set("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>")
 
