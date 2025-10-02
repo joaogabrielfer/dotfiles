@@ -8,6 +8,7 @@ local opts = { noremap = true, silent = true }
 
 -- File Explorer
 vim.keymap.set("n", "-", vim.cmd.Oil, { desc = "Open Oil file explorer" })
+vim.keymap.set("n", "_", "<CMD>:Oil .<CR>", { desc = "Open Oil file explorer in pwd" })
 
 -- Lua execution
 vim.keymap.set("n", "<leader>x", ":.lua<CR>", { desc = "Execute current line as Lua" })

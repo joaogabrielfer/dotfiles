@@ -7,22 +7,39 @@ if [ ! -d "$PROJECTS_DIR" ]; then
     exit 1
 fi
 
-selected_dir=$((echo "$HOME";find "$HOME/Personal" -mindepth 1 -maxdepth 2 -type d; echo "$HOME/.config") | fzf --reverse)
+initial_selection_list=$( (
+    echo "$HOME"
+    find "$PROJECTS_DIR" -mindepth 1 -maxdepth 2 -type d
+    echo "$HOME/.config"
+) | sort -u)
+
+selected_dir=$(echo "$initial_selection_list" | fzf --prompt="Select Project: " --reverse)
 
 if [ -z "$selected_dir" ]; then
     exit 0
 fi
 
-session_name=$(basename "$selected_dir")
+if [ "$selected_dir" == "$HOME/.config" ]; then
+    final_dir=$(find "$HOME/.config" -mindepth 1 -maxdepth 1 -type d | fzf --prompt="Select Config Directory: " --reverse)
+
+    if [ -z "$final_dir" ]; then
+        exit 0
+    fi
+    session_name="config"
+else
+    final_dir="$selected_dir"
+    session_name_raw=$(basename "$final_dir")
+    session_name=${session_name_raw#.}
+fi
 
 if [ -z "$TMUX" ]; then
-    tmux new-session -s "$session_name" -c "$selected_dir"
+    tmux new-session -s "$session_name" -c "$final_dir"
     exit 0
 fi
 
 if tmux has-session -t "$session_name" 2>/dev/null; then
     tmux switch-client -t "$session_name"
 else
-    tmux new-session -d -s "$session_name" -c "$selected_dir"
+    tmux new-session -d -s "$session_name" -c "$final_dir"
     tmux switch-client -t "$session_name"
 fi

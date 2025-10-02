@@ -32,23 +32,6 @@ export EDITOR="nvim"
 
 export PATH=$PATH:$HOME/go/bin
 
- nvim() {
-    if [ "$#" -eq 1 ] && [ -d "$1" ] && [ "$1" != "." ]; then
-	pushd $1
-	command nvim .
-	popd
-    elif [ "$#" -eq 1 ] && [ "$1" = "." ]; then
-	command nvim $1
-    elif [ "$#" -eq 0 ]; then
-	echo "teste"
-	command nvim . 
-    else
-	pushd $(dirname "$1")
-	command nvim $(basename "$1")
-	popd 
-    fi
-}
-
 alias ls='ls --color=auto'
 alias la='ls -lha --color=auto'
 alias szsh='source ~/.config/zsh/.zshrc'

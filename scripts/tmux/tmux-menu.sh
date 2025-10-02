@@ -28,4 +28,5 @@ tmux menu \
     "abrir dir"       f "neww -n files ~/.config/scripts/tmux/menu/abrir-dir.sh" \
     "clonar pwd"      F "neww -c "#{pane_current_path}"" \
     "" "" "" \
-    "man"             m "neww -n man ~/.config/scripts/tmux/menu/man.sh"
+    "man"             m "neww -n man ~/.config/scripts/tmux/menu/man.sh"\
+    "go doc"          g "neww -n man ~/.config/scripts/tmux/menu/go-doc.sh"
