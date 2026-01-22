@@ -1,0 +1,5 @@
+: 1759443143:0;rm zsh/.zsh_history
+: 1759443149:0;git pull
+: 1759443154:0;git stash
+: 1759443157:0;git pull
+: 1759443168:0;la scripts/tmux

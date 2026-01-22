@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+find . -type f -name '*.go' -exec sh -c '
+    echo "--- Content of: {} ---"
+	echo "\`\`\`go"
+    cat "{}"
+	echo "\`\`\`"
+    echo ""
+' \; | wl-copy

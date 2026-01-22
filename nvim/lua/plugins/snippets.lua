@@ -7,22 +7,58 @@ return {
       'rafamadriz/friendly-snippets',
     },
     config = function()
-      -- Require luasnip and its components
       local ls = require("luasnip")
       local s = ls.snippet
       local t = ls.text_node
+      local i = ls.insert_node
+      local fmt = require("luasnip.extras.fmt").fmt
+      local rep = require("luasnip.extras").rep
 
-      -- Load snippets from friendly-snippets
+      -- Configurações
+      ls.config.set_config({
+        history = true,
+        updateevents = "TextChanged,TextChangedI",
+        enable_autosnippets = true,
+        -- Importante para blink.cmp
+        store_selection_keys = "<Tab>",
+      })
+
+      -- Carrega snippets do friendly-snippets
       require("luasnip.loaders.from_vscode").lazy_load()
 
-      -- Define and add your custom Go snippets directly
+      -- Snippets para Go
       ls.add_snippets("go", {
-        -- Snippet for standard error handling
-        s("iferr", t({
-          "if err != nil {",
-          "\tlog.Fatal(err)",
-          "}"
-        }))
+        s("iferr", {
+          t({"if err != nil {", "\t"}),
+          i(1, "log.Fatal(err)"),
+          t({"", "}"})
+        })
+      })
+
+      ls.add_snippets("all", {
+        s("ternary", {
+          i(1, "cond"), t(" ? "), i(2, "then"), t(" : "), i(3, "else")
+        })
+      })
+
+      -- Snippets para C com prioridade maior
+      ls.add_snippets("c", {
+        s({
+          trig = "prints",
+          priority = 1000,
+        }, fmt([[printf("%{}", {});]], {
+          i(1, "d"),
+          i(2, "var")
+        })),
+
+        s({
+          trig = "printvar",
+          priority = 1000,
+        }, fmt([[printf("{} = %{}", {});]], {
+          i(1, "variable"),
+          i(2, "d"),
+          rep(1)
+        })),
       })
     end,
   }

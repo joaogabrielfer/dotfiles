@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+find . -type f -name '*.tmpl' -exec sh -c '
+    echo "--- Content of: {} ---"
+    cat "{}"
+    echo ""
+' \; | wl-copy
