@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+set -e
+
+REGISTRY="$HOME/.local/state/dot/installed_target"
+
+print_usage_exit() {
+	echo -e "\033[33mUSAGE: \033[0m"
+	echo "    $0 <command>"
+	echo ""
+	echo "commands:"
+	echo "    help             -> output this message"
+	echo "    install {target} -> install the desired configuration"
+	echo "    targets          -> list all avaliable configurations"
+	echo "    update           -> fetch the latest changes and updates the local environment"
+	echo "    push             -> push the current config into the remote repository"
+	exit 0
+}
+
+if [[ $# -lt 1 ]]; then
+	print_usage_exit
+fi
+
+case $1 in
+	help)
+		print_usage_exit
+		;;
+	install)
+		if [[ $# -lt 2 ]]; then
+			echo -e "\033[31mERROR:\033[0m Missing target."
+			print_usage_exit
+		fi
+		case $2 in
+			arch-desktop)
+				echo -e "\033[32mInstalling...\033[0m"
+				echo
+				./install-shared.sh
+				./install-arch-desktop.sh
+				echo -e "\033[32mCreating symlinks...\033[0m"
+				echo
+				./link-shared.sh
+				./link-arch-desktop.sh
+				echo -e "\033[32mDone!\033[0m"
+				;;
+			arch-wsl)
+				echo -e "\033[32mInstalling...\033[0m"
+				echo
+				./install-shared.sh
+				echo -e "\033[32mCreating symlinks...\033[0m"
+				echo
+				./link-shared.sh
+				echo -e "\033[32mDone!\033[0m"
+				;;
+		esac
+		;;
+	targets)
+		echo  "Targets: "
+		echo -e "    \033[34march-desktop"
+		echo -e "    arch-wsl\033[0m"
+		;;
+	update)
+		if [[ -d "../.git" ]]; then
+			pushd .. 1>/dev/null
+			git fetch
+			git pull origin main
+			popd 1>/dev/null
+		else
+			echo -e "\033[31mERROR:\033[0m git repository not initialized."
+			exit 1
+		fi
+		;;
+	push)
+		echo empurrando...
+		;;
+esac

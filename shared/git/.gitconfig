@@ -1,0 +1,15 @@
+[user]
+	email = joaoggabriel07@gmail.com
+	name = João Gabriel
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[advice]
+	defaultBranchName = false
+[init]
+	defaultBranch = main
+[pull]
+	rebase = false
