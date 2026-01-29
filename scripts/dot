@@ -2,7 +2,9 @@
 
 set -e
 
-REGISTRY="$HOME/.local/state/dot/installed_target"
+STATE_DIR="$HOME/.local/state/dot"
+STATE_FILE="$HOME/.local/state/dot/installed_target"
+TARGETS=( "arch-desktop" "arch-wsl" )
 
 print_usage_exit() {
 	echo -e "\033[33mUSAGE: \033[0m"
@@ -17,59 +19,147 @@ print_usage_exit() {
 	exit 0
 }
 
-if [[ $# -lt 1 ]]; then
-	print_usage_exit
-fi
+print_error() {
+	echo -e "\033[31mERROR:\033[0m $1"
+}
 
-case $1 in
-	help)
+install_target() {
+	echo -e "\033[32mInstalling...\033[0m"
+
+	case $1 in
+		arch-desktop)
+			./install-arch-desktop.sh
+			./install-shared.sh
+			;;
+		arch-wsl)
+			./install-shared.sh
+			;;
+	esac
+}
+
+link_target() {
+	echo -e "\033[32mCreating symlinks...\033[0m"
+
+	case $1 in
+		arch-desktop)
+			./link-arch-desktop.sh
+			./link-shared.sh
+			;;
+		arch-wsl)
+			./link-shared.sh
+			;;
+	esac
+}
+
+get_target() {
+    if [[ -f "$STATE_FILE" ]]; then
+        # Extrai o valor
+        local found_path=$(grep "^installed_target=" "$STATE_FILE" | cut -d'=' -f2-)
+        
+        if [[ -n "$found_path" ]]; then
+            echo "$found_path"
+            return 0
+        fi
+    fi
+    return 1 
+}
+
+contains() {
+    local busca="$1"
+    shift 
+    
+    for item in "$@"; do
+        [[ "$item" == "$busca" ]] && return 0 
+    done
+    
+    return 1 
+}
+
+main(){
+	if [[ $# -lt 1 ]]; then
+		print_error "Missing command"
 		print_usage_exit
-		;;
-	install)
-		if [[ $# -lt 2 ]]; then
-			echo -e "\033[31mERROR:\033[0m Missing target."
+	fi
+
+	case $1 in
+		help)
 			print_usage_exit
-		fi
-		case $2 in
-			arch-desktop)
-				echo -e "\033[32mInstalling...\033[0m"
-				echo
-				./install-shared.sh
-				./install-arch-desktop.sh
-				echo -e "\033[32mCreating symlinks...\033[0m"
-				echo
-				./link-shared.sh
-				./link-arch-desktop.sh
+			;;
+		install)
+			if  [[ $# -lt 2 ]] || ! contains "$2" "${TARGETS[@]}" ;then
+				print_error "Missing or unknown target."
+				print_usage_exit
+			fi
+			if [[ $(get_target) == "" ]]; then
+				mkdir -p $STATE_DIR
+				# install_target $2
+				link_target $2
 				echo -e "\033[32mDone!\033[0m"
-				;;
-			arch-wsl)
-				echo -e "\033[32mInstalling...\033[0m"
+				echo "installed_target=$2" > $STATE_FILE
+			else
+				echo -e "\033[33mWARNING:\033[0m Instalation detected."
+				echo -en "Do you wish to reinstall? (\033[32mY\033[0m/\033[31mn\033[0m) "
+				read input
+				case $input in
+					"" | "y")
+						install_target $2
+						link_target $2
+						echo -e "\n\033[32mDone!\033[0m"
+						rm $STATE_FILE
+						echo "installed_target=$2" > $STATE_FILE
+						;;
+					*)
+						exit 0
+						;;
+				esac
+			fi
+			;;
+		targets)
+			echo  "Targets: "
+			echo -e "    \033[34march-desktop"
+			echo -e "    arch-wsl\033[0m"
+			;;
+		update)
+			if [[ $(get_target) == "" ]]; then
+				print_error "Instalation not detected. Please install first."
+				exit 1
+			fi
+			if [[ -d "$HOME/dotfiles/.git" ]]; then
+				pushd $HOME/dotfiles/ 1>/dev/null
+				echo -e "\033[32mDownloading latest changes...\033[0m"
+				git fetch
+				git pull origin main
 				echo
-				./install-shared.sh
-				echo -e "\033[32mCreating symlinks...\033[0m"
-				echo
-				./link-shared.sh
-				echo -e "\033[32mDone!\033[0m"
-				;;
-		esac
-		;;
-	targets)
-		echo  "Targets: "
-		echo -e "    \033[34march-desktop"
-		echo -e "    arch-wsl\033[0m"
-		;;
-	update)
-		if [[ -d "../.git" ]]; then
-			pushd .. 1>/dev/null
-			git fetch
-			git pull origin main
-			popd 1>/dev/null
-		else
-			echo -e "\033[31mERROR:\033[0m git repository not initialized."
-			exit 1
-		fi
-		;;
-	push)
-		echo empurrando...
-		;;
-esac
+				popd 1>/dev/null
+			else
+				print_error "Repository not found."
+				exit 1
+			fi
+
+			link_target $(get_target)
+			echo -e "\n\033[32mDone!\033[0m"
+			;;
+		push)
+			if [[ -d "$HOME/dotfiles/.git" ]]; then
+				pushd $HOME/dotfiles/ 1>/dev/null
+				echo -e "\033[32mDownloading latest changes...\033[0m"
+				git add .
+				echo -e "\nInsira a mensagem de commit:"
+				echo -en "\033[32m>> \033[0m"
+				read msg
+				git commit -m "$msg"
+				git push origin main
+				popd 1>/dev/null
+			else
+				print_error "Repository not found."
+				exit 1
+			fi
+			;;
+		*)
+			print_error "Unknown command."
+			print_usage_exit 
+			;;
+	esac
+}
+
+main $@
