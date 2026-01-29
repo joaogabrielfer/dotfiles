@@ -11,9 +11,6 @@ tmux menu \
     -s "fg=${text}" \
     -S "fg=${peach}" \
     -H "fg=${text}" \
-    "config file"     c "neww -n config ~/.config/scripts/tmux/menu/config-file.sh" \
-    "config dir"      C "neww -n config ~/.config/scripts/tmux/menu/config-dir.sh" \
-    "" "" "" \
     "abrir nota"      n "neww -n nota ~/.config/scripts/tmux/menu/abrir-nota.sh" \
     "criar nota"      N "neww -n nota ~/.config/scripts/tmux/menu/criar-nota.sh" \
     "" "" "" \
