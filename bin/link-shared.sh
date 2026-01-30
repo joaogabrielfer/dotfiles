@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+ln -vsf $DOT_DIR/shared/zsh/.zshrc $HOME/.zshrc
+ln -vsf $DOT_DIR/shared/zsh/.zsh_history $HOME/.zsh_history
+ln -vsf $DOT_DIR/shared/git/.gitconfig $HOME/.gitconfig
+
+rm -rf $HOME/.config/tmux
+ln -vsfd $DOT_DIR/shared/tmux $HOME/.config/tmux
+
+rm -rf $HOME/.config/nvim
+ln -vsfd $DOT_DIR/shared/nvim $HOME/.config/nvim
+
+rm -rf $HOME/.config/scripts
+ln -vsfd $DOT_DIR/shared/scripts $HOME/.config/scripts
+
+# file cmds.sh to link in $HOME/.config/cmds.sh
+ln -vsf $DOT_DIR/shared/cmds.sh $HOME/.config/cmds.sh

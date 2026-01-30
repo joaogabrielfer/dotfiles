@@ -5,75 +5,10 @@ set -e
 STATE_DIR="$HOME/.local/state/dot"
 STATE_FILE="$HOME/.local/state/dot/installed_target"
 TARGETS=( "arch-desktop" "arch-wsl" )
+ADD_TARGETS=( "shared" "arch-desktop" "arch-wsl" )
+export DOT_DIR="$HOME/dotfiles"
 
-print_usage_exit() {
-	echo -e "\033[33mUSAGE: \033[0m"
-	echo "    $0 <command>"
-	echo ""
-	echo "commands:"
-	echo "    help             -> output this message"
-	echo "    install {target} -> install the desired configuration"
-	echo "    targets          -> list all avaliable configurations"
-	echo "    update           -> fetch the latest changes and updates the local environment"
-	echo "    push             -> push the current config into the remote repository"
-	exit 0
-}
-
-print_error() {
-	echo -e "\033[31mERROR:\033[0m $1"
-}
-
-install_target() {
-	echo -e "\033[32mInstalling...\033[0m"
-
-	case $1 in
-		arch-desktop)
-			./install-arch-desktop.sh
-			./install-shared.sh
-			;;
-		arch-wsl)
-			./install-shared.sh
-			;;
-	esac
-}
-
-link_target() {
-	echo -e "\033[32mCreating symlinks...\033[0m"
-
-	case $1 in
-		arch-desktop)
-			./link-arch-desktop.sh
-			./link-shared.sh
-			;;
-		arch-wsl)
-			./link-shared.sh
-			;;
-	esac
-}
-
-get_target() {
-    if [[ -f "$STATE_FILE" ]]; then
-        # Extrai o valor
-        local found_path=$(grep "^installed_target=" "$STATE_FILE" | cut -d'=' -f2-)
-        
-        if [[ -n "$found_path" ]]; then
-            echo "$found_path"
-            return 0
-        fi
-    fi
-    return 1 
-}
-
-contains() {
-    local busca="$1"
-    shift 
-    
-    for item in "$@"; do
-        [[ "$item" == "$busca" ]] && return 0 
-    done
-    
-    return 1 
-}
+source $DOT_DIR/bin/cmds.sh
 
 main(){
 	if [[ $# -lt 1 ]]; then
@@ -124,8 +59,8 @@ main(){
 				print_error "Instalation not detected. Please install first."
 				exit 1
 			fi
-			if [[ -d "$HOME/dotfiles/.git" ]]; then
-				pushd $HOME/dotfiles/ 1>/dev/null
+			if [[ -d "$DOT_DIR/.git" ]]; then
+				pushd $DOT_DIR/ 1>/dev/null
 				echo -e "\033[32mDownloading latest changes...\033[0m"
 				git fetch
 				git pull origin main
@@ -140,8 +75,8 @@ main(){
 			echo -e "\n\033[32mDone!\033[0m"
 			;;
 		push)
-			if [[ -d "$HOME/dotfiles/.git" ]]; then
-				pushd $HOME/dotfiles/ 1>/dev/null
+			if [[ -d "$DOT_DIR/.git" ]]; then
+				pushd $DOT_DIR/ 1>/dev/null
 				echo -e "\033[32mDownloading latest changes...\033[0m"
 				git add .
 				echo -e "\nInsira a mensagem de commit:"
@@ -154,6 +89,40 @@ main(){
 				print_error "Repository not found."
 				exit 1
 			fi
+			;;
+		add-link)
+			if  [[ $# -lt 3 ]];then
+				print_error "Missing arguments"
+				print_usage_exit
+			fi
+
+			local target=$2
+			local name=$3
+
+			if ! contains "$target" "${ADD_TARGETS[@]}"; then
+				print_error "Unknown target."
+				exit 1
+			fi
+
+			if [ $# -gt 3 ]; then
+				dest_path="$4/$name"
+			else
+				dest_path="\$HOME/.config/$name"
+			fi
+
+			if [ -d "$name" ]; then
+				link_dir $target $name $dest_path
+			elif [ -f "$name" ]; then
+				link_file $target $name $dest_path
+			else
+				print_error "Could not add file or dir: \"$3\""
+				exit 1
+			fi
+
+			;;
+		add-pkg)
+			echo "TODO: add-pkg"
+			exit 0
 			;;
 		*)
 			print_error "Unknown command."
