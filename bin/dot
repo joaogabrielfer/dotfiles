@@ -77,13 +77,14 @@ main(){
 		push)
 			if [[ -d "$DOT_DIR/.git" ]]; then
 				pushd $DOT_DIR/ 1>/dev/null
-				echo -e "\033[32mDownloading latest changes...\033[0m"
+				echo -e "\033[32mStaging local changes...\033[0m"
 				git add .
-				echo -e "\nInsira a mensagem de commit:"
+				echo -e "\nInsert commit message:"
 				echo -en "\033[32m>> \033[0m"
 				read msg
 				git commit -m "$msg"
 				git push origin main
+				echo -e "\n\033[32mRepository updated succesfully...\033[0m"
 				popd 1>/dev/null
 			else
 				print_error "Repository not found."
