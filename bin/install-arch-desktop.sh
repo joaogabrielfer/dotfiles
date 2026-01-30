@@ -2,7 +2,7 @@
 
 source $DOT_DIR/bin/cmds.sh
 
-PKGS=("audacity" "discord-canary" "ghostty" "hypridle" "hyprland" "hyprlock" "hyprpaper" "hyprshot" "mpv" "spotify" "thunar" "vlc" "waybar" "waypaper" "wireplumber" "zen-browser-bin")
+PKGS=("audacity" "discord-canary" "ghostty" "hypridle" "hyprland" "hyprlock" "hyprpaper" "hyprshot" "mpv" "spotify" "thunar" "vlc" "waybar" "waypaper" "wireplumber" "zen-browser-bin" "swww")
 
 if check_if_updates; then
 	update_pacman 

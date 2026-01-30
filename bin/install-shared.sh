@@ -2,7 +2,7 @@
 
 source $DOT_DIR/bin/cmds.sh
 
-PKGS=("fastfetch" "otf-font-awesome" "ttf-jetbrains-mono" "texlive-fontsextra" "ttf-jetbrains-mono-nerd" "man-db" "tealdeer" "wikiman" "arch-wiki-docs" "neovim" "npm" "deno" "cmake" "gcc" "llvm" "luarocks" "unzip" "lua" "wl-clipboard" "clang" "tmux" "fzf" "bat" "go")
+PKGS=("fastfetch" "otf-font-awesome" "ttf-jetbrains-mono" "texlive-fontsextra" "ttf-jetbrains-mono-nerd" "man-db" "tealdeer" "wikiman" "arch-wiki-docs" "neovim" "npm" "deno" "cmake" "gcc" "llvm" "luarocks" "unzip" "lua" "wl-clipboard" "clang" "tmux" "fzf" "bat" "go" )
 
 if check_if_updates; then
 	update_pacman 

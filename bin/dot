@@ -71,6 +71,7 @@ main(){
 				exit 1
 			fi
 
+			install_target $(get_target)
 			link_target $(get_target)
 			echo -e "\n\033[32mDone!\033[0m"
 			;;
@@ -112,9 +113,11 @@ main(){
 			fi
 
 			if [ -d "$name" ]; then
-				link_dir $target $name $dest_path
+				printf "\033[32mLinking directory\033[0m \033[34m%s\033[0m \033[32mto\033[0m \033[34m%s\033[0m\n" "$name" "$dest_path"
+				add_link_dir $target $name $dest_path
 			elif [ -f "$name" ]; then
-				link_file $target $name $dest_path
+				printf "\033[32mLinking file\033[0m \033[34m%s\033[0m \033[32mto\033[0m \033[34m%s\033[0m\n" "$name" "$dest_path"
+				add_link_file $target $name $dest_path
 			else
 				print_error "Could not add file or dir: \"$3\""
 				exit 1
@@ -122,8 +125,21 @@ main(){
 
 			;;
 		add-pkg)
-			echo "TODO: add-pkg"
-			exit 0
+			if  [[ $# -lt 3 ]];then
+				print_error "Missing arguments"
+				print_usage_exit
+			fi
+
+			local target=$2
+			local pkg=$3
+
+			if ! contains "$target" "${ADD_TARGETS[@]}"; then
+				print_error "Unknown target."
+				exit 1
+			fi
+
+			add_install $target $pkg
+			echo -e "\033[32mAdded\033[0m \033[34m$pkg\033[0m \033[32mto $DOT_DIR/bin/install-$target.sh\033[0m"
 			;;
 		*)
 			print_error "Unknown command."

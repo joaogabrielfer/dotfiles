@@ -47,15 +47,20 @@ install_package_paru(){
 	paru -S --noconfirm $1
 }
 
-link_file(){
+add_link_file(){
 	printf "\n# file %s to link in %s" "$2" "$3" >> $DOT_DIR/bin/link-"$1".sh
 	printf "\nln -vsf %s %s" "\$DOT_DIR/$1/$2" "$3" >> $DOT_DIR/bin/link-"$1".sh
 }
 
-link_dir(){
+add_link_dir(){
 	printf "\n# dir %s to link in %s" "$2" "$3" >> $DOT_DIR/bin/link-"$1".sh
 	printf "\nrm -rf %s" "$3" >> $DOT_DIR/bin/link-"$1".sh
 	printf "\nln -vsf %s %s" "\$DOT_DIR/$1/$2" "$3" >> $DOT_DIR/bin/link-"$1".sh
+}
+
+add_install(){
+	file=$DOT_DIR/bin/install-"$1".sh
+	sed -i -E 's/=\(("[^"]+"\s?)+/& "'"$2"'"/g' "$file"
 }
 
 print_usage_exit() {
