@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 ln -vsf $DOT_DIR/shared/zsh/.zshrc $HOME/.zshrc
-ln -vsf $DOT_DIR/shared/zsh/.zsh_history $HOME/.zsh_history
 ln -vsf $DOT_DIR/shared/git/.gitconfig $HOME/.gitconfig
 
 rm -rf $HOME/.config/tmux

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source ./cmds.sh
+source $DOT_DIR/bin/cmds.sh
 
 PKGS=("audacity" "discord-canary" "ghostty" "hypridle" "hyprland" "hyprlock" "hyprpaper" "hyprshot" "mpv" "spotify" "thunar" "vlc" "waybar" "waypaper" "wireplumber" "zen-browser-bin")
 

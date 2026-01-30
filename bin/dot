@@ -84,7 +84,7 @@ main(){
 				read msg
 				git commit -m "$msg"
 				git push origin main
-				echo -e "\n\033[32mRepository updated succesfully...\033[0m"
+				echo -e "\n\033[32mRepository updated succesfully!\033[0m"
 				popd 1>/dev/null
 			else
 				print_error "Repository not found."
