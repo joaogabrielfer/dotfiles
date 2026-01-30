@@ -12,6 +12,3 @@ ln -vsfd $DOT_DIR/shared/nvim $HOME/.config/nvim
 
 rm -rf $HOME/.config/scripts
 ln -vsfd $DOT_DIR/shared/scripts $HOME/.config/scripts
-
-# file cmds.sh to link in $HOME/.config/cmds.sh
-ln -vsf $DOT_DIR/shared/cmds.sh $HOME/.config/cmds.sh
