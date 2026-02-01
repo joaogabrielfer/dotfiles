@@ -1,47 +1,96 @@
 {
-  "position": "top",
-  "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["hyprland/window"],
-  "modules-right": ["network", "pulseaudio","custom/audio-switcher", "clock"],
-  "clock": {
-    "format": "<span foreground='#f5c2e7'>   </span>{:%a %d %H:%M}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-  },
-  "network": {
-    "format-wifi": "<span size='13000' foreground='#f5e0dc'> </span>{essid}",
-    "format-ethernet": "<span size='13000' foreground='#f5e0dc'></span>",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "<span size='13000' foreground='#f5e0dc'>  </span>Disconnected",
-    "tooltip-format-wifi": "Signal Strenght: {signalStrength}%"
-  },
-  "pulseaudio": {
-      "format": "{icon}  {volume}%",
-      "format-muted": "  0%",
-      "format-icons": {
-          "default": ["", "", " "]
-      },
-      "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
-  },
-  "custom/audio-switcher": {
-      "format": "{}",
-      "exec": "~/.config/waybar/scripts/audio_switcher.sh",
-      "on-click": "~/.config/waybar/scripts/audio_switcher.sh switch",
-      "interval": 1,
-      "return-type": "json"
-  },
-  "hyprland/workspaces": {
-      "format": "{icon}",
-      "format-icons": {
-	  "1": "1",
-	  "2": "2",
-	  "3": "3",
-	  "4": "4",
-	  "5": "5",
-	  "6": "6",
-	  "7": "7",
-	  "8": "8",
-	  "9": "9",
-	  "default": ""
-      }
-  }
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "margin-top": 0,
+    "margin-bottom": 0,
+
+	"modules-left": [
+		"custom/home",
+		"custom/sep",
+		"hyprland/workspaces",
+		"custom/sep",
+		"hyprland/window"
+	],
+    "modules-center": [],
+    "modules-right": [
+        "network",
+        "pulseaudio",
+        "custom/audio-switcher",
+        "clock",
+        "custom/power"
+    ],
+
+    /* ───────────── WORKSPACE HOME (alias do 11) ───────────── */
+	"custom/home": {
+		"format": "",
+		"return-type": "json",
+		"signal": 8,           
+		"exec": "~/.config/waybar/scripts/workspacer.sh", 
+		"interval": 1, // <-- Reativado para sincronização automática
+		"on-click": "~/.config/hypr/scripts/toggle_special.sh",
+		"tooltip": false
+	},
+
+	/* ───────────── WORKSPACES NUMÉRICOS ───────────── */
+	"hyprland/workspaces": {
+		"all-outputs": false,
+		"active-only": false,
+		"persistent-only": true,
+		"persistent-workspaces": {
+			"1": [], "2": [], "3": [], "4": [], "5": [],
+			"6": [], "7": [], "8": [], "9": []
+		}
+	},
+
+    /* ───────────── JANELA ATIVA ───────────── */
+    "hyprland/window": {
+        "format": "{title}",
+        "max-length": 45,
+        "separate-outputs": true
+    },
+
+    /* ───────────── SEPARADOR ───────────── */
+    "custom/sep": {
+        "format": "|",
+        "tooltip": false
+    },
+
+    /* ───────────── REDE ───────────── */
+    "network": {
+        "format-wifi": "  {essid}",
+        "format-ethernet": "",
+        "format-disconnected": "  Offline"
+    },
+
+    /* ───────────── ÁUDIO ───────────── */
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "  0%",
+        "format-icons": {
+            "default": ["", "", ""]
+        },
+        "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    },
+
+    "custom/audio-switcher": {
+        "format": "{}",
+        "exec": "~/.config/waybar/scripts/audio_switcher.sh",
+        "on-click": "~/.config/waybar/scripts/audio_switcher.sh switch",
+        "interval": 1,
+        "return-type": "json"
+    },
+
+    /* ───────────── RELÓGIO ───────────── */
+    "clock": {
+        "format": "  {:%a %d %H:%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+    },
+
+    /* ───────────── POWERMENU ───────────── */
+    "custom/power": {
+        "format": "",
+        "on-click": "quickshell -p ~/.config/waybar/scripts/powermenu.qml",
+        "tooltip": false
+    }
 }

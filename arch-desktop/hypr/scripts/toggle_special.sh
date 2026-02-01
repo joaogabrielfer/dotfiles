@@ -10,3 +10,5 @@ else
     # If we are on any other workspace, go to workspace 10
     hyprctl dispatch workspace 11
 fi
+
+pkill -RTMIN+8 waybar

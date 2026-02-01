@@ -1,29 +1,32 @@
 {
-  description = "NixOS Config";
+  description = "NixOS Config com Dotfiles Integrados";
 
   inputs = {
-	nixpkgs.url = "nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Adicionando seu repositório de dotfiles aqui
+    my-dotfiles = {
+      url = "github:joaogabrielfer/dotfiles";
+      flake = false; # Como é um repositório comum, tratamos como fonte de dados
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }: {
+  outputs = { self, nixpkgs, home-manager, my-dotfiles, ... }@inputs: {
     nixosConfigurations.nixpc = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux"; # Adicionado: necessário para flakes
+      system = "x86_64-linux";
+      specialArgs = { inherit inputs; }; # Passa os inputs (incluindo dotfiles) para os módulos
       modules = [
         ./configuration.nix
-
-        # Importa o módulo do home-manager
         home-manager.nixosModules.home-manager
-
-        # Bloco de configuração do home-manager
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "backup";
           home-manager.users.jgfer = import ./home.nix;
+          home-manager.extraSpecialArgs = { inherit inputs; };
         }
       ];
     };

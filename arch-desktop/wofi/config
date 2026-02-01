@@ -5,13 +5,13 @@ show=drun
 prompt=Apps
 normal_window=true
 layer=top
-term=foot
-columns=2
+term=ghostty
+columns=1
 term=ghostty
 
 ## Geometry
-width=50%
-height=30%
+width=25%
+height=40%
 location=0
 orientation=vertical
 halign=fill
@@ -27,7 +27,7 @@ image_size=24
 exec_search=false
 hide_search=false
 parse_search=false
-insensitive=false
+insensitive=true
 
 ## Other
 hide_scroll=true
@@ -38,4 +38,6 @@ filter_rate=100
 
 ## Keys
 key_expand=Tab
-key_exit=Super_L
+key_exit=Ctrl-q
+key_up=Ctrl-k
+key_down=Ctrl-j

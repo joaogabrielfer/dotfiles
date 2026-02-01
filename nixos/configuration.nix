@@ -1,80 +1,53 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
-  imports =
-    [
-      ./hardware-configuration.nix
-    ];
+  imports = [ ./hardware-configuration.nix ];
 
+  # Bootloader centralizado
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  
+  # Entrada manual para o Arch Linux (baseado no seu fstab)
+  boot.loader.systemd-boot.extraEntries = {
+    "arch.conf" = ''
+      title Arch Linux
+      linux /vmlinuz-linux
+      initrd /intel-ucode.img
+      initrd /initramfs-linux.img
+      options root=UUID=e6ca3a63-2d0e-44a2-9095-f5327acc7232 rw
+    '';
+  };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "nixpc"; # Define your hostname.
-  # services.pipewire = {
-  #   enable = true;
-  #   pulse.enable = true;
-  # };
+  networking.hostName = "nixpc";
+  networking.networkmanager.enable = true; # Recomendado para desktop
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  services.libinput.enable = true;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true; 
+  };
 
-        services.getty.autologinUser = "jgfer";
-        programs.hyprland = {
-                enable = true;
-                xwayland.enable = true;
-        };
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
 
   users.users.jgfer = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-    packages = with pkgs; [
-      tree
-    ];
+    extraGroups = [ "wheel" "networkmanager" ];
+    packages = with pkgs; [ tree ];
   };
 
-  programs.firefox.enable = true;
-
-  # List packages installed in system profile.
-  # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
-    vim
-                neovim
-    wget
-                hyprpaper
-                waybar
-                ghostty
-                kitty
-                git
+    vim neovim wget git git-credential-oauth
+    hyprpaper waybar ghostty kitty
+    fastfetch rofi-wayland # pacotes que vi nos seus dotfiles
+	where-is-my-sddm-theme
   ];
 
-        nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   services.openssh.enable = true;
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  system.copySystemConfiguration = true;
-
-  system.stateVersion = "25.11"; # Did you read the comment?
-
+  system.stateVersion = "25.05"; # Use a versão estável atual ou 25.05 se for unstable
 }

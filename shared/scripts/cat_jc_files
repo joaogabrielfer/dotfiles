@@ -1,7 +1,0 @@
-#! /usr/bin/env bash
-
-find . -type f -name '*.go' -o -name '*.tmpl' | while IFS= read -r file; do
-    echo "--- Content of: $file ---"
-    cat "$file"
-    echo "" 
-done | wl-copy 

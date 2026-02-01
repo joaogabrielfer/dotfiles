@@ -1,0 +1,9 @@
+#! /usr/bin/env bash
+
+find . -type f $@ | while IFS= read -r file; do
+    echo "--- Content of: $file ---"
+	echo '```'"$(echo "$file" | awk -F . '{if (NF>1) print $NF}')"
+    cat "$file"
+	echo '```'
+    echo "" 
+done | wl-copy 

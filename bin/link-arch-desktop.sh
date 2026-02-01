@@ -23,3 +23,7 @@ ln -vsfd $DOT_DIR/arch-desktop/waypaper $HOME/.config/waypaper
 
 rm -rf $HOME/.config/wofi
 ln -vsfd $DOT_DIR/arch-desktop/wofi $HOME/.config/wofi
+
+# dir alacritty to link in $HOME/.config/alacritty
+rm -rf $HOME/.config/alacritty
+ln -vsf $DOT_DIR/arch-desktop/alacritty $HOME/.config/alacritty
