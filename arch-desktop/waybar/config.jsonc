@@ -12,12 +12,15 @@
 		"custom/sep",
 		"hyprland/window"
 	],
-    "modules-center": [],
+    "modules-center": [
+		"clock",
+	],
     "modules-right": [
-        "network",
+		"cpu",
+		"memory",
+		"network",
         "pulseaudio",
         "custom/audio-switcher",
-        "clock",
         "custom/power"
     ],
 
@@ -63,14 +66,32 @@
         "format-disconnected": "  Offline"
     },
 
-    /* ───────────── ÁUDIO ───────────── */
+	/* ───────────── CPU ───────────── */
+	"cpu": {
+		"format": "󰘚 {usage: >3}%",
+		"on-click": "pypr toggle btop"
+	},
+  // "temperature": {
+  //   "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
+  //   "critical-threshold": 80,
+  //   "format": "  {temperatureC}°C",
+  //   "on-click": "neohtop"
+  // },
+	/* ───────────── MEMÓRIA ───────────── */
+	"memory": {
+		"format": " {: >3}%",
+		"on-click": "pypr toggle btop"
+	},
+
+	/* ───────────── ÁUDIO ───────────── */
     "pulseaudio": {
         "format": "{icon} {volume}%",
         "format-muted": "  0%",
         "format-icons": {
             "default": ["", "", ""]
         },
-        "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+        "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+        "on-click-right": "pypr toggle volume",
     },
 
     "custom/audio-switcher": {

@@ -14,7 +14,7 @@ wofi_input() {
 # 1. Gerar lista inicial
 initial_list=$( (
     (
-        echo "~"
+        echo "home"
         echo "~/.config"
         fd . "$PROJECTS_DIR" --min-depth 1 --max-depth 2 --type d | sed "s|^$HOME|~|"
     ) | sort -u
@@ -24,14 +24,39 @@ initial_list=$( (
 selected_display=$(echo "$initial_list" | $WOFI_BASE --prompt "Selecionar Projeto:")
 [ -z "$selected_display" ] && exit 0
 
-selected_dir="${selected_display//\~/$HOME}"
+# Lógica para converter o nome de exibição para o caminho real
+if [ "$selected_display" == "home" ]; then
+    selected_dir="$HOME"
+else
+    selected_dir="${selected_display//\~/$HOME}"
+fi
 
 # Lógica de Config
 if [ "$selected_dir" == "$HOME/.config" ]; then
-    final_dir_display=$(fd . -td -tl "$HOME/.config" --max-depth 1 | sed "s|^$HOME|~|" | $WOFI_BASE --prompt "Pasta de Config:")
-    [ -z "$final_dir_display" ] && exit 0
+    # Gera lista combinando .config, ~/dotfiles, e subpastas de arch-desktop e shared
+    dirs=$( (
+        echo "dotfiles"
+        fd . -td -tl "$HOME/.config" --max-depth 1 --exec echo {/}
+        fd . -td -tl "$HOME/dotfiles/arch-desktop" --max-depth 1 --exec echo {/}
+        fd . -td -tl "$HOME/dotfiles/shared" --max-depth 1 --exec echo {/}
+    ) | sed 's/\/$//' | sort -u )
+
+    final_display_dir=$(echo "$dirs" | $WOFI_BASE --prompt "Pasta de Config:")
+    [ -z "$final_display_dir" ] && exit 0
     
-    final_dir="${final_dir_display//\~/$HOME}"
+    # Define o caminho real baseado em onde a pasta foi encontrada (precedência: .config > arch-desktop > shared)
+    if [ "$final_display_dir" == "dotfiles" ]; then
+        final_dir="$HOME/dotfiles"
+    elif [ -d "$HOME/.config/$final_display_dir" ]; then
+        final_dir="$HOME/.config/$final_display_dir"
+    elif [ -d "$HOME/dotfiles/arch-desktop/$final_display_dir" ]; then
+        final_dir="$HOME/dotfiles/arch-desktop/$final_display_dir"
+    elif [ -d "$HOME/dotfiles/shared/$final_display_dir" ]; then
+        final_dir="$HOME/dotfiles/shared/$final_display_dir"
+    else
+        final_dir="$HOME/.config/$final_display_dir"
+    fi
+
     session_name="config/$(basename "$final_dir")"
 
 # Lógica de New Project
@@ -68,11 +93,7 @@ fi
 has_clients=$(tmux list-clients 2>/dev/null)
 
 if [ -n "$TMUX" ] || [ -n "$has_clients" ]; then
-    # Se você já estiver no tmux ou houver um terminal aberto com tmux, 
-    # ele apenas troca a sessão no terminal visível.
     tmux switch-client -t "$session_name"
 else
-    # Se não houver nenhum terminal com tmux aberto, abre um novo.
-    # Nota: Certifique-se que a variável $terminal esteja definida (ex: terminal="ghostty")
     $terminal -e tmux attach-session -t "$session_name"
 fi

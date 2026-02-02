@@ -66,6 +66,8 @@ window#waybar {
 #pulseaudio,
 #custom-audio-switcher,
 #clock,
+#cpu,
+#memory,
 #custom-power {
     padding: 0 12px;
     margin: 5px 3px;
@@ -88,6 +90,7 @@ window#waybar {
     background-color: rgba(243, 139, 168, 0.1);
     font-size: 15px;
     margin-right: 10px;
+	padding-right: 15px;
 }
 
 #custom-home {

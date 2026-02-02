@@ -1,0 +1,31 @@
+[pyprland]
+plugins = [
+    "scratchpads",
+    "expose",
+]
+
+[exopse]
+include_special = true
+
+[scratchpads.term]
+command = "alacritty --class alacritty-dropterm"
+class = "alacritty-dropterm"
+size = "75% 60%"
+animation = "fromTop"
+
+[scratchpads.volume]
+command = "pavucontrol"
+class = "org.pulseaudio.pavucontrol"
+size = "35% 70%"
+position = " 63% 5%"
+animation = "fromRight"
+lazy = true
+
+[scratchpads.btop]
+command = "alacritty --class btop -e btop"
+class = "btop"
+size = "45% 55%"
+position = "53% 5%"
+unfocus = "hide"
+hysteresis = 0
+animation = "fromTop"

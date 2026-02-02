@@ -38,6 +38,8 @@ alias la='eza --icons --header -long -A'
 alias tns='tmux new-session -n session  "/home/joaogabriel/.config/scripts/tmux/new-session.sh"'
 alias ta='tmux a'
 
+alias edit='sudo -e'
+
 function lt(){
 	if [[ "$#" -gt 1 ]]; then
 		eza --icons --header -long -A -T --level=$2 $1
