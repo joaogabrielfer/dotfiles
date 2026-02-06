@@ -1,11 +1,29 @@
 -- Definimos o mapa de ícones no topo para ser usado de forma segura e rápida
 local kind_icons = {
-  Text = "󰉿", Method = "󰆧", Function = "󰊕", Constructor = "",
-  Field = "󰜢", Variable = "󰀫", Class = "󰠱", Interface = "",
-  Module = "", Property = "󰜢", Unit = "󰑭", Value = "󰎠",
-  Enum = "", Keyword = "󰌋", Snippet = "", Color = "󰏘",
-  File = "󰈙", Reference = "󰈇", Folder = "󰉋", EnumMember = "",
-  Constant = "󰏿", Struct = "󰙅", Event = "", Operator = "󰆕",
+  Text = "󰉿",
+  Method = "󰆧",
+  Function = "󰊕",
+  Constructor = "",
+  Field = "󰜢",
+  Variable = "󰀫",
+  Class = "󰠱",
+  Interface = "",
+  Module = "",
+  Property = "󰜢",
+  Unit = "󰑭",
+  Value = "󰎠",
+  Enum = "",
+  Keyword = "󰌋",
+  Snippet = "",
+  Color = "󰏘",
+  File = "󰈙",
+  Reference = "󰈇",
+  Folder = "󰉋",
+  EnumMember = "",
+  Constant = "󰏿",
+  Struct = "󰙅",
+  Event = "",
+  Operator = "󰆕",
   TypeParameter = "󰉿",
 }
 
@@ -24,6 +42,8 @@ return {
         preset = 'none',
         ['<Tab>'] = { 'select_next', 'fallback' },
         ['<S-Tab>'] = { 'select_prev', 'fallback' },
+        ['<C-n>'] = { 'select_next', 'fallback' },
+        ['<C-p>'] = { 'select_prev', 'fallback' },
         ['<CR>'] = { 'accept', 'fallback' },
         ['<A-.>'] = { 'snippet_forward', 'fallback' },
         ['<A-,>'] = { 'snippet_backward', 'fallback' },
@@ -35,24 +55,25 @@ return {
       },
       sources = {
         default = { 'lsp', 'path', 'snippets', 'buffer' },
-        -- Aumentamos a prioridade dos snippets para resolver o problema do 'prints'
-        -- providers = {
-        --   snippets = {
-        --     score_offset = 100, 
-        --   }
-        -- }
       },
       snippets = {
         preset = 'luasnip',
       },
       completion = {
         documentation = { auto_show = true, window = { border = 'rounded' } },
+        ghost_text = { enabled = true },
+        list = {
+          selection = {
+            preselect = false,  -- Não pré-seleciona o primeiro item
+            auto_insert = false -- Não insere o texto automaticamente ao navegar
+          },
+        },
         menu = {
           border = 'rounded',
           draw = {
             columns = {
               { "kind_icon" },
-              { "label", "label_description", gap = 1 },
+              { "label",    "label_description", gap = 1 },
               { "kind" },
             },
             components = {
