@@ -23,7 +23,7 @@ return {
             Lua = {
               runtime = { version = "LuaJIT" },
               diagnostics = { globals = { "vim" } },
-              workspace = { 
+              workspace = {
                 checkThirdParty = false,
                 -- REMOVED manual library entries. 
                 -- lazydev.nvim handles this dynamically, preventing duplicates.
@@ -40,6 +40,7 @@ return {
         html = {},
         arduino_language_server = {},
         cmake = {},
+        -- rust_analyzer = {},
       }
     },
     config = function(_, opts)
@@ -82,4 +83,9 @@ return {
       end
     end
   },
+  -- {
+  --   'mrcjkb/rustaceanvim',
+  --   version = '^7', -- Recommended
+  --   lazy = false, -- This plugin is already lazy
+  -- }
 }
