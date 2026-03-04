@@ -1,9 +1,9 @@
 @import "mocha.css";
 
 * {
-    font-family: "JetBrains Mono Light", "Geist Mono", "MesloLGS NF";
+    font-family: "SF Pro Text", "JetBrains Mono Light", "Geist Mono", "MesloLGS NF";
     font-size: 13px;
-    font-weight: 300;
+    font-weight: 400;
     border: none;
     border-radius: 0;
 }
@@ -58,7 +58,6 @@ window#waybar {
 #window {
     color: @subtext1;
     margin-left: 10px;
-    font-style: italic;
 }
 
 /* ───────────── MÓDULOS DIREITA ───────────── */
@@ -85,6 +84,10 @@ window#waybar {
     color: @maroon;
 }
 
+#custom-audio-switcher{
+	padding-right: 20px;
+}
+
 #custom-power {
     color: @red;
     background-color: rgba(243, 139, 168, 0.1);
@@ -94,7 +97,7 @@ window#waybar {
 }
 
 #custom-home {
-	margin-left: 10px;
+	margin-left: 15px;
 	margin-right: 0px;
 
 	padding: 0px 4px;
@@ -111,7 +114,7 @@ window#waybar {
 
 	padding-top: 4px;
 	padding-left: 12px;
-	padding-right: 16px;
+	padding-right: 12px;
 }
 
 #custom-home:hover {

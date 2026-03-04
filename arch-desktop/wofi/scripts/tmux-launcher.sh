@@ -2,6 +2,8 @@
 
 PERSONAL_DIR="$HOME/personal"
 PROGRAMMING_DIR="$HOME/personal/programming/"
+# Adicionado diretório de notas
+NOTES_DIR="$HOME/personal/notas"
 
 CSS="$HOME/.config/wofi/styles.css"
 WOFI_BASE="wofi --dmenu --style $CSS --width 25% --height 40% --prompt 'Mudar para:'"
@@ -15,9 +17,10 @@ initial_list=$( (
     (
         echo "home"
         echo "config"
-		echo "personal"
-		echo "programming"
-		) ) )
+        echo "personal"
+        echo "programming"
+        echo "notas"
+    ) ) )
 
 selected_display=$(echo "$initial_list" | $WOFI_BASE --prompt "Selecionar Projeto:")
 [ -z "$selected_display" ] && exit 0
@@ -27,6 +30,9 @@ if [ "$selected_display" == "home" ]; then
 else
     selected_dir="${selected_display//\~/$HOME}"
 fi
+
+# Variável para comando específico (ex: nvim arquivo)
+custom_command=""
 
 if [ "$selected_dir" == "config" ]; then
     dirs=$( (
@@ -53,34 +59,68 @@ if [ "$selected_dir" == "config" ]; then
 
     session_name="config/$(basename "$final_dir")"
 
-elif [[ "$selected_display" == "new project" ]]; then
-    prog_dir="$PROJECTS_DIR/Programming"
-    category_display=$(fd . "$prog_dir" --max-depth 1 --type d | sed "s|^$HOME|~|" | $WOFI_BASE --prompt "Categoria:")
-    [ -z "$category_display" ] && exit 0
-    
-    category_path="${category_display//\~/$HOME}"
-    project_name=$(echo "" | wofi_input "Nome do novo projeto:")
-    [ -z "$project_name" ] && exit 1
-
-    final_dir="$category_path/$project_name"
-    mkdir -p "$final_dir"
-    session_name=${project_name#.}
-
-elif [[ "$selected_dir" == "programming" ]]; then
-	selection=$((
-		fd . -td -tl "$PROGRAMMING_DIR" --min-depth 2 --max-depth 2
-		echo "tmp"
-		) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^tmp\/.*$//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Projeto:")
+# ---------------------------------------------------------
+# LÓGICA DE NOTAS (ADICIONADA)
+# ---------------------------------------------------------
+elif [[ "$selected_dir" == "notas" ]]; then
+    selection=$( (
+        echo "nova"
+        fd --type f . "$NOTES_DIR" | sed "s|^$NOTES_DIR/||"
+    ) | $WOFI_BASE --prompt "Nota:")
 
     [ -z "$selection" ] && exit 0
+
+    if [[ "$selection" == "nova" ]]; then
+        note_name=$(echo "" | wofi_input "Nome da nota (sem .md):")
+        [ -z "$note_name" ] && exit 1
+        
+        filename="${note_name}.md"
+        # Cria diretório pai se necessário
+        mkdir -p "$(dirname "$NOTES_DIR/$filename")"
+    else
+        filename="$selection"
+    fi
+
+    final_dir="$NOTES_DIR"
     
-    final_dir="$PROGRAMMING_DIR$selection"
-    mkdir -p "$final_dir"
-    session_name=$selection
+    # Sanitiza o nome para a sessão do tmux (remove .md e troca / por _)
+    sanitized_name=$(echo "$filename" | sed 's/\.md$//')
+    session_name="notas"
+    
+    # Define o comando para abrir o nvim direto no arquivo
+	custom_command="nvim '$filename'"
+
+elif [[ "$selected_dir" == "programming" ]]; then
+    selection=$((
+        echo "new-project"
+        fd . -td -tl "$PROGRAMMING_DIR" --min-depth 2 --max-depth 2
+        echo "tmp"
+        ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^tmp\/.*$//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Projeto:")
+
+    [ -z "$selection" ] && exit 0
+
+    if [[ "$selection" == "new-project" ]]; then
+        category_display=$((
+            fd . "$PROGRAMMING_DIR" --max-depth 1 --type d 
+            ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/.*\/tmp//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Categoria:")
+        [ -z "$category_display" ] && exit 0
+        
+        category_path="$PERSONAL_DIR/$category_display"
+        project_name=$(echo "" | wofi_input "Nome do novo projeto:")
+        [ -z "$project_name" ] && exit 1
+
+        final_dir="$category_path/$project_name"
+        mkdir -p "$final_dir"
+        session_name="$(basename $category_display)/$project_name"
+    else
+        final_dir="$PROGRAMMING_DIR$selection"
+        mkdir -p "$final_dir"
+        session_name=$selection
+    fi
 elif [[ "$selected_dir" == "personal" ]]; then
-	selection=$((
-		fd . -td -tl "$PERSONAL_DIR" --max-depth 2
-		) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^.*programming.*//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Projeto:")
+    selection=$((
+        fd . -td -tl "$PERSONAL_DIR" --max-depth 2
+        ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^.*programming.*//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Projeto:")
 
     [ -z "$selection" ] && exit 0
     
@@ -88,20 +128,26 @@ elif [[ "$selected_dir" == "personal" ]]; then
     mkdir -p "$final_dir"
     session_name=$selection
 elif [[ "$selected_dir" == "$HOME" ]]; then
-	final_dir="$selected_dir"
-	session_name="home"
+    final_dir="$selected_dir"
+    session_name="home"
 else 
     final_dir="$selected_dir"
     session_name=$(basename "$final_dir" | sed 's/^\.//')
 fi
 
+# Tratamento de sessão duplicada
 if tmux has-session -t "$session_name" 2>/dev/null; then
+    # Se já existe, pergunta novo nome, mas mantém o custom_command (se houver)
     new_name=$(echo "${session_name}-2" | wofi_input "Sessão já existe! Novo nome:")
     session_name="${new_name:-${session_name}-2}"
 fi
 
 if ! tmux has-session -t "$session_name" 2>/dev/null; then
-    tmux new-session -d -s "$session_name" -c "$final_dir"
+	if [[ "$selected_dir" == "notas" ]]; then
+		tmux new-session -d -s "$session_name" -c "$final_dir" "$custom_command"
+	else 
+		tmux new-session -d -s "$session_name" -c "$final_dir"
+	fi
 fi
 
 has_clients=$(tmux list-clients 2>/dev/null)

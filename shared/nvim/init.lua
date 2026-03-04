@@ -17,6 +17,25 @@ require("config.remap")
 require 'nvim-treesitter.install'.compilers = { "clang" }
 require("luasnip.loaders.from_vscode").lazy_load()
 
+vim.g.vim_markdown_frontmatter = 1
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.conceallevel = 2
+  end,
+})
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = "*.md",
+  callback = function()
+    -- Substitua pelo caminho do seu Vault
+    if vim.fn.expand("%:p"):find("/home/joaogabriel/personal/notas/") then
+      vim.cmd("RenderMarkdown disable")
+    else
+      vim.cmd("RenderMarkdown enable")
+    end
+  end,
+})
+
 vim.opt.completeopt = { "menuone", "noselect" }
 
 vim.opt.shiftwidth = 4
