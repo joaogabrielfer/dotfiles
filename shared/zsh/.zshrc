@@ -31,6 +31,7 @@ export MANPAGER="nvim +Man!"
 export EDITOR="nvim"
 
 export PATH=$PATH:$HOME/go/bin
+export PATH="$HOME/.cargo/bin:$PATH"
 
 alias ls='eza --icons --header'
 alias la='eza --icons --header -long -A'
@@ -54,3 +55,5 @@ alias ~='cd ~'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+
+alias gacp='git add . && git commit && git push origin main'
