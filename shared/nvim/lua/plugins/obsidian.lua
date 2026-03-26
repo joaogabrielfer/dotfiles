@@ -50,21 +50,6 @@ return {
         return tostring(os.time()) .. "-" .. suffix
       end,
 
-      -- 5. Templates Robusto
-      templates = {
-        subdir = "templates", -- Pasta: ~/personal/notas/templates
-        date_format = "%d/%m/%Y",
-        time_format = "%H:%M",
-        tags = "",
-        substitutions = {
-          -- Aqui você pode criar variáveis customizadas para usar nos templates
-          -- Exemplo no md: {{yesterday}}
-          yesterday = function()
-            return os.date("%Y-%m-%d", os.time() - 86400)
-          end,
-        }
-      },
-
       -- 6. UI (Desativada para usar render-markdown sem conflitos)
       ui = {
         enable = true,  -- Deixe o render-markdown cuidar da beleza
@@ -106,8 +91,6 @@ return {
           { label = "📝 Nova Nota", cmd = "ObsidianNew" },
           { label = "🔍 Pesquisar Notas (Quick Switch)", cmd = "ObsidianQuickSwitch" },
           { label = "🔎 Pesquisar Texto (Grep)", cmd = "ObsidianSearch" },
-          { label = "📅 Nota Diária (Today)", cmd = "ObsidianToday" },
-          { label = "📄 Inserir Template", cmd = "ObsidianTemplate" },
           { label = "🔗 Ver Backlinks", cmd = "ObsidianBacklinks" },
           { label = "🖼️ Colar Imagem", cmd = "ObsidianPasteImg" },
           { label = "🏷️ Renomear Nota (com refactor)", cmd = "ObsidianRename" },

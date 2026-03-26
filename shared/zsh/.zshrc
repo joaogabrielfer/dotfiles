@@ -57,3 +57,4 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 
 alias gacp='git add . && git commit && git push origin main'
+alias gl='git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit'
