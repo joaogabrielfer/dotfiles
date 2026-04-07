@@ -38,7 +38,7 @@ return {
       },
 
       -- 4. Frontmatter (Metadados)
-      disable_frontmatter = false,
+      disable_frontmatter = true,
       note_id_func = function(title)
         -- Gera IDs legíveis em vez de aleatórios (ex: "Minha Nota" -> "Minha-Nota")
         local suffix = ""
