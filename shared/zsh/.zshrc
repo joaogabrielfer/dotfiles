@@ -58,3 +58,6 @@ alias ....='cd ../../..'
 
 alias gacp='git add . && git commit && git push origin main'
 alias gl="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+# Created by `pipx` on 2026-04-07 15:57:08
+export PATH="$PATH:/home/joaogabriel/.local/bin"

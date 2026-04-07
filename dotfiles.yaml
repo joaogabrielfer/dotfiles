@@ -1,0 +1,126 @@
+targets:
+  shared:
+    packages:
+      paru:
+        - git
+        - github-cli
+        - neovim
+        - tmux
+        - zsh
+        - go
+        - gcc
+        - npm
+        - deno
+        - cmake
+        - clang
+        - llvm
+        - luarocks
+        - rustup
+        - zigup-bin
+        - bat
+        - eza
+        - fd
+        - fzf
+        - jq
+        - btop
+        - fastfetch
+        - tealdeer
+        - wikiman
+        - arch-wiki-docs
+        - man-db
+        - man-pages
+        - rsync
+        - unrar
+        - tree
+        - bc
+        - calc
+        - wget
+        - pacman-contrib
+        - otf-font-awesome
+        - ttf-jetbrains-mono
+        - ttf-jetbrains-mono-nerd
+        - nerd-fonts-sf-mono
+        - apple-fonts
+    links:
+      shared/zsh/.zshrc: ~/.zshrc
+      shared/git/.gitconfig: ~/.gitconfig
+      shared/tmux: ~/.config/tmux
+      shared/nvim: ~/.config/nvim
+      shared/scripts: ~/.config/scripts
+
+  arch-desktop:
+    inherits:
+      - shared
+    packages:
+      paru:
+        - hyprland
+        - hypridle
+        - hyprlock
+        - hyprpaper
+        - hyprpicker
+        - hyprshot
+        - waybar
+        - waypaper
+        - wofi
+        - swaync
+        - pyprland
+        - quickshell
+        - xdg-desktop-portal-hyprland
+        - xdg-desktop-portal-wlr
+        - uwsm
+        - qt6-wayland
+        - wl-clipboard
+        - pipewire
+        - pipewire-alsa
+        - pipewire-jack
+        - pipewire-pulse
+        - wireplumber
+        - pavucontrol
+        - vlc
+        - mpv
+        - spotify
+        - audacity
+        - obs-studio
+        - imv
+        - nsxiv
+        - zen-browser-bin
+        - brave-bin
+        - zoom
+        - obsidian
+        - gimp
+        - raylib
+        - steam
+        - gamemode
+        - protonup-qt
+        - protontricks
+        - wine
+        - alacritty
+        - thunar
+        - brightnessctl
+        - ddcutil
+        - piper
+        - polkit-kde-agent
+        - udiskie
+        - ntfs-3g
+        - nvidia-open
+        - libva-nvidia-driver
+        - sddm
+    links:
+      arch-desktop/user-dirs.dirs: ~/.config/user-dirs.dirs
+      arch-desktop/user-dirs.locale: ~/.config/user-dirs.locale
+      arch-desktop/ghostty: ~/.config/ghostty
+      arch-desktop/hypr: ~/.config/hypr
+      arch-desktop/swaync: ~/.config/swaync
+      arch-desktop/wallpapers: ~/.config/wallpapers
+      arch-desktop/waybar: ~/.config/waybar
+      arch-desktop/waypaper: ~/.config/waypaper
+      arch-desktop/wofi: ~/.config/wofi
+      arch-desktop/alacritty: ~/.config/alacritty
+      arch-desktop/pypr: ~/.config/pypr
+
+  arch-wsl:
+    inherits:
+      - shared
+    packages:
+      paru: []
+    links: {}
