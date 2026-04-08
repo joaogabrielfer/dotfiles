@@ -1,7 +1,7 @@
 # ~/.config/alacritty/alacritty.toml
 
 [terminal.shell]
-program = "/bin/zsh"
+program = "/usr/bin/fish"
 
 [window]
 opacity = 0.8
