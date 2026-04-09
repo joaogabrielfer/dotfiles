@@ -28,7 +28,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
   pattern = "*.md",
   callback = function()
     -- Substitua pelo caminho do seu Vault
-    if vim.fn.expand("%:p"):find("/home/joaogabriel/personal/notas/") then
+    if vim.fn.expand("%:p"):find(vim.fn.expand("~") .. "/personal/notas/") then
       vim.cmd("RenderMarkdown disable")
     else
       vim.cmd("RenderMarkdown enable")

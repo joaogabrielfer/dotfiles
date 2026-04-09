@@ -12,6 +12,9 @@
       url = "github:joaogabrielfer/dotfiles";
       flake = false; # Como é um repositório comum, tratamos como fonte de dados
     };
+    dms = {
+      url = "github:danklinux/dms";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, my-dotfiles, ... }@inputs: {

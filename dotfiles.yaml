@@ -56,10 +56,13 @@ targets:
                 - nvidia-open
                 - libva-nvidia-driver
                 - sddm
+                - niri
+                - dms-shell
         links:
             arch-desktop/alacritty: ~/.config/alacritty
             arch-desktop/ghostty: ~/.config/ghostty
             arch-desktop/hypr: ~/.config/hypr
+            arch-desktop/niri: ~/.config/niri
             arch-desktop/pypr: ~/.config/pypr
             arch-desktop/swaync: ~/.config/swaync
             arch-desktop/user-dirs.dirs: ~/.config/user-dirs.dirs

@@ -1,0 +1,120 @@
+// Niri Configuration file
+// Mirrors user's Hyprland setup
+
+// Start Dank Material Shell natively
+spawn-at-startup "dms" "run"
+// Start other required services
+spawn-at-startup "udiskie"
+spawn-at-startup "swww-daemon"
+spawn-at-startup "waypaper" "--restore"
+
+input {
+    keyboard {
+        xkb {
+            layout "br"
+            variant "abnt2"
+            model "abnt2"
+        }
+    }
+    mouse {
+        accel-speed -0.5
+    }
+}
+
+layout {
+    gaps 10
+    center-focused-column "never"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    default-column-width { proportion 0.5; }
+
+    focus-ring {
+        width 2
+        active-color "#cba6f7"
+        inactive-color "#1e1e2e"
+    }
+
+    border {
+        off
+    }
+}
+
+animations {
+    slowdown 1.0
+}
+
+binds {
+    // Keys consist of modifiers separated by + signs, followed by an XKB key name
+    // Mod is a special modifier that defaults to Super.
+    Mod+B { spawn "zen-browser"; }
+    Mod+T { spawn "alacritty"; }
+    Mod+Q { close-window; }
+    Mod+M { quit; }
+    Mod+E { spawn "thunar"; }
+    Mod+V { toggle-window-floating; }
+    Mod+R { spawn "wofi" "--show" "drun" "-s" "~/.config/wofi/styles.css" "-c" "~/.config/wofi/config" "-C" "~/.config/wofi/colors"; }
+    Mod+F { maximize-column; }
+    Mod+D { spawn "sh" "-c" "~/.config/hypr/scripts/toggle_special.sh"; }
+    Mod+Escape { spawn "hyprlock"; }
+    Mod+S { spawn "sh" "-c" "~/.config/wofi/scripts/tmux-sessions.sh"; }
+    Mod+Shift+T { spawn "sh" "-c" "~/.config/wofi/scripts/tmux-launcher.sh"; }
+    Mod+Shift+S { spawn "sh" "-c" "hyprshot -m region -o ~/Pictures/screenshots -z"; }
+    Mod+Print { spawn "sh" "-c" "hyprshot -m active -m window -o ~/Pictures/screenshots"; }
+    Mod+Y { spawn "swaync-client" "-t" "-R" "-rs"; }
+    Mod+O { spawn "sh" "-c" "~/.config/scripts/launch-browser-obsidian.sh"; }
+
+    // Focus bindings
+    Mod+H { focus-column-left; }
+    Mod+L { focus-column-right; }
+    Mod+K { focus-window-up; }
+    Mod+J { focus-window-down; }
+
+    // Move bindings
+    Mod+Shift+H { move-column-left; }
+    Mod+Shift+L { move-column-right; }
+    Mod+Shift+K { move-window-up; }
+    Mod+Shift+J { move-window-down; }
+
+    // Workspaces
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+    Mod+0 { focus-workspace 10; }
+
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+    Mod+Shift+6 { move-column-to-workspace 6; }
+    Mod+Shift+7 { move-column-to-workspace 7; }
+    Mod+Shift+8 { move-column-to-workspace 8; }
+    Mod+Shift+9 { move-column-to-workspace 9; }
+    Mod+Shift+0 { move-column-to-workspace 10; }
+
+    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
+    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+
+    // Audio & Brightness
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    XF86AudioMute        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    XF86AudioMicMute     allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"; }
+    XF86MonBrightnessUp  allow-when-locked=true { spawn "brightnessctl" "-e4" "-n2" "set" "5%+"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "-e4" "-n2" "set" "5%-"; }
+
+    XF86AudioNext { spawn "playerctl" "next"; }
+    XF86AudioPause { spawn "playerctl" "play-pause"; }
+    XF86AudioPlay { spawn "playerctl" "play-pause"; }
+    XF86AudioPrev { spawn "playerctl" "previous"; }
+}

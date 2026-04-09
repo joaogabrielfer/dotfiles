@@ -24,9 +24,9 @@ switch_port() {
 # Function to output JSON for Waybar's display
 update_display() {
     if [ "$CURRENT_PORT" == "$SPEAKERS_PORT" ]; then
-        echo '{"text":"", "tooltip":"Output: Speakers"}'
-    else
         echo '{"text":"", "tooltip":"Output: Headphones"}'
+    else
+        echo '{"text":"", "tooltip":"Output: Speakers"}'
     fi
 }
 

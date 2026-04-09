@@ -1,24 +1,23 @@
- config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
+  imports = [
+    ./modules/packages.nix
+    ./modules/terminal.nix
+    ./modules/shell.nix
+    ./modules/tmux.nix
+    ./modules/git.nix
+    ./modules/hyprland.nix
+    ./modules/waybar.nix
+    ./modules/wofi.nix
+    ./modules/desktop-extras.nix
+    ./modules/nvim.nix
+    ./modules/niri.nix
+  ];
+
   home.username = "jgfer";
   home.homeDirectory = "/home/jgfer";
-  home.stateVersion = "24.11";
-
-  # Mapeamento declarativo dos arquivos do repositório
-  xdg.configFile = {
-    # Mapeia a pasta Hyprland do repositório para o ~/.config/hypr
-    "hypr".source = "${inputs.my-dotfiles}/arch-desktop/hypr";
-    
-    # Mapeia Waybar
-    "waybar".source = "${inputs.my-dotfiles}/arch-desktop/waybar";
-    
-    # Mapeia Neovim (Shared)
-    "nvim".source = "${inputs.my-dotfiles}/shared/nvim";
-    
-    # Caso queira mapear arquivos individuais:
-    # "kitty/kitty.conf".source = "${inputs.my-dotfiles}/shared/kitty/kitty.conf";
-  };
+  home.stateVersion = "25.05";
 
   programs.bash = {
     enable = true;
