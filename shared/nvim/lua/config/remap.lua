@@ -24,13 +24,8 @@ setkey("n", "<leader>q", "<C-w>q", { desc = "Close current window" })
 -- Insert mode escape
 setkey("i", "<C-c>", "<Esc>", { desc = "Exit insert mode" })
 
--- Move lines (visual mode)
-setkey("v", "J", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move selection down" })
-setkey("v", "K", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move selection up" })
-
 -- Move lines (normal mode)
-setkey("n", "<A-J>", "<S-v>:m '>+1<CR>gv=gv<S-v>", { silent = true, desc = "Move line down" })
-setkey("n", "<A-K>", "<S-v>:m '<-2<CR>gv=gv<S-v>", { silent = true, desc = "Move line up" })
+-- in Alt hjkl in mini.lua
 
 -- Scroll and center
 setkey("n", "<C-d>", "<C-d>zz", { desc = "Scroll down and center" })

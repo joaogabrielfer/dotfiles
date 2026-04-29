@@ -97,3 +97,8 @@ chars = "\u001b8"
 key = "Key9"
 mods = "Alt"
 chars = "\u001b9"
+
+[[keyboard.bindings]]
+key = "Back"
+mods = "Control"
+chars = "\u0017" 

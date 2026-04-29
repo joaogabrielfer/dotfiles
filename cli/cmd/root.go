@@ -33,6 +33,8 @@ func init() {
 	rootCmd.AddCommand(pushCmd)
 	rootCmd.AddCommand(addLinkCmd)
 	rootCmd.AddCommand(addPkgCmd)
+	rootCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(targetsCmd)
 }
 
 func Execute() {
@@ -216,3 +218,4 @@ var addPkgCmd = &cobra.Command{
 		fmt.Printf("\033[32mAdded %s to %s\033[0m\n", pkgName, targetName)
 	},
 }
+

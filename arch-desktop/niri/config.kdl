@@ -7,6 +7,36 @@ spawn-at-startup "dms" "run"
 spawn-at-startup "udiskie"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "waypaper" "--restore"
+spawn-at-startup "systemctl" "--user" "start" "vicinae"
+prefer-no-csd
+
+// workspace "browser"
+// window-rule {
+//     match app-id="zen-browser"
+//
+//     // Forces the window to open on your named workspace
+//     open-on-workspace "browser"
+//
+//     // Sets the window to full screen upon opening
+//  	open-maximized-to-edges true
+// }
+// workspace "terminal"
+// window-rule {
+//     match app-id="Alacritty"
+//
+//     // Forces the window to open on your named workspace
+//     open-on-workspace "terminal"
+//
+//     // Sets the window to full screen upon opening
+//  	open-maximized-to-edges true
+// }
+
+window-rule {
+	geometry-corner-radius 8
+	clip-to-geometry true
+	draw-border-with-background false
+}
+
 
 input {
     keyboard {
@@ -15,14 +45,17 @@ input {
             variant "abnt2"
             model "abnt2"
         }
+        repeat-delay 200
+        repeat-rate 25
     }
+
     mouse {
         accel-speed -0.5
     }
 }
 
 layout {
-    gaps 10
+    gaps 5
     center-focused-column "never"
 
     preset-column-widths {
@@ -34,7 +67,8 @@ layout {
 
     focus-ring {
         width 2
-        active-color "#cba6f7"
+        // active-color "#cba6f7"
+		active-color "#fab387"
         inactive-color "#1e1e2e"
     }
 
@@ -44,7 +78,7 @@ layout {
 }
 
 animations {
-    slowdown 1.0
+    slowdown 0.8
 }
 
 binds {
@@ -52,32 +86,43 @@ binds {
     // Mod is a special modifier that defaults to Super.
     Mod+B { spawn "zen-browser"; }
     Mod+T { spawn "alacritty"; }
+    Mod+Return { spawn "vicinae" "toggle"; }
     Mod+Q { close-window; }
     Mod+M { quit; }
     Mod+E { spawn "thunar"; }
     Mod+V { toggle-window-floating; }
-    Mod+R { spawn "wofi" "--show" "drun" "-s" "~/.config/wofi/styles.css" "-c" "~/.config/wofi/config" "-C" "~/.config/wofi/colors"; }
-    Mod+F { maximize-column; }
-    Mod+D { spawn "sh" "-c" "~/.config/hypr/scripts/toggle_special.sh"; }
+    Mod+F { maximize-window-to-edges; }
     Mod+Escape { spawn "hyprlock"; }
-    Mod+S { spawn "sh" "-c" "~/.config/wofi/scripts/tmux-sessions.sh"; }
-    Mod+Shift+T { spawn "sh" "-c" "~/.config/wofi/scripts/tmux-launcher.sh"; }
-    Mod+Shift+S { spawn "sh" "-c" "hyprshot -m region -o ~/Pictures/screenshots -z"; }
+    Mod+S { spawn "sh" "-c" "~/.config/scripts/tmux-sessions.sh"; }
+    Mod+Shift+T { spawn "sh" "-c" "~/.config/scripts/tmux-launcher.sh"; } //todo: arrumar isso aqui
+    Mod+Shift+S { screenshot ; }
     Mod+Print { spawn "sh" "-c" "hyprshot -m active -m window -o ~/Pictures/screenshots"; }
-    Mod+Y { spawn "swaync-client" "-t" "-R" "-rs"; }
-    Mod+O { spawn "sh" "-c" "~/.config/scripts/launch-browser-obsidian.sh"; }
+	Mod+Tab { toggle-overview; }
+	Mod+A{ spawn "~/.config/niri/scripts/toggle-audio.sh"; }
+	// Mod+D { spawn "sh" "-c" "~/.config/hypr/scripts/toggle_special.sh"; }
+    // Mod+Y { spawn "swaync-client" "-t" "-R" "-rs"; }
+    // Mod+O { spawn "sh" "-c" "~/.config/scripts/launch-browser-obsidian.sh"; }
 
     // Focus bindings
     Mod+H { focus-column-left; }
     Mod+L { focus-column-right; }
-    Mod+K { focus-window-up; }
-    Mod+J { focus-window-down; }
+    Mod+K { focus-workspace-up; }
+    Mod+J { focus-workspace-down; }
 
     // Move bindings
     Mod+Shift+H { move-column-left; }
     Mod+Shift+L { move-column-right; }
-    Mod+Shift+K { move-window-up; }
-    Mod+Shift+J { move-window-down; }
+    Mod+Shift+K { move-window-to-workspace-up; }
+    Mod+Shift+J { move-window-to-workspace-down; }
+
+	Mod+Control+H{ set-column-width "-3%"; }
+	Mod+Control+L{ set-column-width "+3%"; }
+
+	Mod+Control+Y{ set-column-width "34%"; }
+	Mod+Control+U{ set-column-width "50%"; }
+	Mod+Control+I{ set-column-width "66%"; }
+	Mod+Control+O{ set-column-width "75%"; }
+	Mod+Control+P{ set-column-width "100%"; }
 
     // Workspaces
     Mod+1 { focus-workspace 1; }
@@ -102,8 +147,8 @@ binds {
     Mod+Shift+9 { move-column-to-workspace 9; }
     Mod+Shift+0 { move-column-to-workspace 10; }
 
-    Mod+WheelScrollDown      cooldown-ms=150 { focus-workspace-down; }
-    Mod+WheelScrollUp        cooldown-ms=150 { focus-workspace-up; }
+    Mod+WheelScrollDown      cooldown-ms=150 { focus-column-left; }
+    Mod+WheelScrollUp        cooldown-ms=150 { focus-column-right; }
 
     // Audio & Brightness
     XF86AudioRaiseVolume allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
@@ -113,8 +158,14 @@ binds {
     XF86MonBrightnessUp  allow-when-locked=true { spawn "brightnessctl" "-e4" "-n2" "set" "5%+"; }
     XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "-e4" "-n2" "set" "5%-"; }
 
-    XF86AudioNext { spawn "playerctl" "next"; }
-    XF86AudioPause { spawn "playerctl" "play-pause"; }
-    XF86AudioPlay { spawn "playerctl" "play-pause"; }
-    XF86AudioPrev { spawn "playerctl" "previous"; }
+    XF86AudioPlay        { spawn "playerctl" "--player=spotify,%any" "play-pause"; }
+    XF86AudioPause       { spawn "playerctl" "--player=spotify,%any" "play-pause"; }
+    XF86AudioNext        { spawn "playerctl" "--player=spotify,%any" "next"; }
+    XF86AudioPrev        { spawn "playerctl" "--player=spotify,%any" "previous"; }
 }
+
+output "DP-1" {
+    mode "1920x1080@165"
+}
+
+include "dms/windowrules.kdl"

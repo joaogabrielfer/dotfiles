@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-CSS="$HOME/.config/wofi/styles.css"
-WOFI_CMD="wofi --dmenu --style $CSS --width 400 --height 300 --prompt 'Mudar para:'"
+WOFI_CMD="fuzzel --dmenu --width 40 --lines 10"
 terminal="alacritty"
 
 sessions=$(tmux list-sessions -F "#S" 2>/dev/null)

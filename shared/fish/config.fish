@@ -46,5 +46,7 @@ set -g fish_cursor_visual block
 
 bind -M insert \cf forward-char
 
+fzf --fish | source
+
 set -g __fish_git_prompt_color_branch brmagenta -i # -i Sets italics mode
 set -g __fish_git_prompt_showupstream none

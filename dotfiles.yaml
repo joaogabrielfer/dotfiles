@@ -58,6 +58,7 @@ targets:
                 - sddm
                 - niri
                 - dms-shell
+                - fuzzel
         links:
             arch-desktop/alacritty: ~/.config/alacritty
             arch-desktop/ghostty: ~/.config/ghostty
@@ -70,7 +71,6 @@ targets:
             arch-desktop/wallpapers: ~/.config/wallpapers
             arch-desktop/waybar: ~/.config/waybar
             arch-desktop/waypaper: ~/.config/waypaper
-            arch-desktop/wofi: ~/.config/wofi
     arch-wsl:
         inherits:
             - shared

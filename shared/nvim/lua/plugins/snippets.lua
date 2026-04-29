@@ -41,25 +41,6 @@ return {
         })
       })
 
-      -- Snippets para C com prioridade maior
-      ls.add_snippets("c", {
-        s({
-          trig = "prints",
-          priority = 1000,
-        }, fmt([[printf("%{}", {});]], {
-          i(1, "d"),
-          i(2, "var")
-        })),
-
-        s({
-          trig = "printvar",
-          priority = 1000,
-        }, fmt([[printf("{} = %{}", {});]], {
-          i(1, "variable"),
-          i(2, "d"),
-          rep(1)
-        })),
-      })
     end,
   }
 }

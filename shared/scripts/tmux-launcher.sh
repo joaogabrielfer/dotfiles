@@ -5,12 +5,11 @@ PROGRAMMING_DIR="$HOME/personal/programming/"
 # Adicionado diretório de notas
 NOTES_DIR="$HOME/personal/notas"
 
-CSS="$HOME/.config/wofi/styles.css"
-WOFI_BASE="wofi --dmenu --style $CSS --width 25% --height 40% --prompt 'Mudar para:'"
+LAUNCHER="fuzzel --dmenu --width 35% --lines 15 --prompt 'Mudar para:'"
 terminal="alacritty"
 
-wofi_input() {
-    wofi --dmenu --width 400 --height 50 --style $CSS --prompt "$1" --cache-file /dev/null
+launcher_input() {
+    fuzzel --dmenu --width 400 --lines 10 --prompt "$1" --cache-file /dev/null
 }
 
 initial_list=$( (
@@ -22,7 +21,7 @@ initial_list=$( (
         echo "notas"
     ) ) )
 
-selected_display=$(echo "$initial_list" | $WOFI_BASE --prompt "Selecionar Projeto:")
+selected_display=$(echo "$initial_list" | $LAUNCHER --prompt "Selecionar Projeto:")
 [ -z "$selected_display" ] && exit 0
 
 if [ "$selected_display" == "home" ]; then
@@ -42,7 +41,7 @@ if [ "$selected_dir" == "config" ]; then
         fd . -td -tl "$HOME/dotfiles/shared" --max-depth 1 --exec echo {/}
     ) | sed 's/\/$//' | sort -u )
 
-    final_display_dir=$(echo "$dirs" | $WOFI_BASE --prompt "Pasta de Config:")
+    final_display_dir=$(echo "$dirs" | $LAUNCHER --prompt "Pasta de Config:")
     [ -z "$final_display_dir" ] && exit 0
     
     if [ "$final_display_dir" == "dotfiles" ]; then
@@ -66,12 +65,12 @@ elif [[ "$selected_dir" == "notas" ]]; then
     selection=$( (
         echo "nova"
         fd --type f . "$NOTES_DIR" | sed "s|^$NOTES_DIR/||"
-    ) | $WOFI_BASE --prompt "Nota:")
+    ) | $LAUNCHER --prompt "Nota:")
 
     [ -z "$selection" ] && exit 0
 
     if [[ "$selection" == "nova" ]]; then
-        note_name=$(echo "" | wofi_input "Nome da nota (sem .md):")
+        note_name=$(echo "" | launcher_input "Nome da nota (sem .md):")
         [ -z "$note_name" ] && exit 1
         
         filename="${note_name}.md"
@@ -95,18 +94,18 @@ elif [[ "$selected_dir" == "programming" ]]; then
         echo "new-project"
         fd . -td -tl "$PROGRAMMING_DIR" --min-depth 2 --max-depth 2
         echo "tmp"
-        ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^tmp\/.*$//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Projeto:")
+        ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^tmp\/.*$//' | sed '/^[[:blank:]]*$/d' | $LAUNCHER --prompt "Projeto:")
 
     [ -z "$selection" ] && exit 0
 
     if [[ "$selection" == "new-project" ]]; then
         category_display=$((
             fd . "$PROGRAMMING_DIR" --max-depth 1 --type d 
-            ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/.*\/tmp//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Categoria:")
+            ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/.*\/tmp//' | sed '/^[[:blank:]]*$/d' | $LAUNCHER --prompt "Categoria:")
         [ -z "$category_display" ] && exit 0
         
         category_path="$PERSONAL_DIR/$category_display"
-        project_name=$(echo "" | wofi_input "Nome do novo projeto:")
+        project_name=$(echo "" | launcher_input "Nome do novo projeto:")
         [ -z "$project_name" ] && exit 1
 
         final_dir="$category_path/$project_name"
@@ -120,7 +119,7 @@ elif [[ "$selected_dir" == "programming" ]]; then
 elif [[ "$selected_dir" == "personal" ]]; then
     selection=$((
         fd . -td -tl "$PERSONAL_DIR" --max-depth 2
-        ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^.*programming.*//' | sed '/^[[:blank:]]*$/d' | $WOFI_BASE --prompt "Projeto:")
+        ) | sed -E 's/^\/.*(\/.*\/.*\/)/\1/' | sed -E 's/^\/(.*)\/$/\1/' | sed -E 's/^.*programming.*//' | sed '/^[[:blank:]]*$/d' | $LAUNCHER --prompt "Projeto:")
 
     [ -z "$selection" ] && exit 0
     
@@ -138,7 +137,7 @@ fi
 # Tratamento de sessão duplicada
 if tmux has-session -t "$session_name" 2>/dev/null; then
     # Se já existe, pergunta novo nome, mas mantém o custom_command (se houver)
-    new_name=$(echo "${session_name}-2" | wofi_input "Sessão já existe! Novo nome:")
+    new_name=$(echo "${session_name}-2" | launcher_input "Sessão já existe! Novo nome:")
     session_name="${new_name:-${session_name}-2}"
 fi
 
