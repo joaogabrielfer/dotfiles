@@ -62,3 +62,59 @@ vim.opt.showmode = false
 vim.g.theme_flavor = "peach"
 require("colors.colorscheme-flavor")
 vim.cmd.colorscheme "catppuccin"
+
+vim.filetype.add({ extension = { slur = "slur", }, })
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function(event)
+    vim.keymap.set("n", "dd", function()
+      local qf_list = vim.fn.getqflist()
+      local cursor_idx = vim.api.nvim_win_get_cursor(0)[1]
+
+      if #qf_list > 0 then
+        table.remove(qf_list, cursor_idx)
+        vim.fn.setqflist(qf_list, 'r')
+
+        local new_idx = math.max(1, math.min(cursor_idx, #qf_list))
+        if new_idx > 0 then
+          vim.api.nvim_win_set_cursor(0, { new_idx, 0 })
+        end
+      end
+    end, { buffer = event.buf, silent = true, desc = "Remover item da Quickfix" })
+  end,
+})
+
+local last_diag_count = -1
+
+vim.api.nvim_create_autocmd("DiagnosticChanged", {
+  group = vim.api.nvim_create_augroup("LspQuickfixSync", { clear = true }),
+  callback = function()
+    local qf = vim.fn.getqflist({ title = 1, size = 1 })
+
+    if qf.size == 0 or qf.title == "Diagnostics" then
+      local diags = vim.diagnostic.get(nil, { severity = { min = vim.diagnostic.severity.WARN } })
+      local current_count = #diags
+
+      if current_count > 0 then
+        vim.diagnostic.setqflist({
+          open = false,
+          title = "Diagnostics",
+          severity = { min = vim.diagnostic.severity.WARN },
+        })
+      else
+        vim.fn.setqflist({}, 'r', { title = "Diagnostics" })
+      end
+
+      if current_count ~= last_diag_count then
+        if current_count > 0 then
+          vim.notify(current_count .. " erro(s)/aviso(s) listados.", vim.log.levels.WARN, { title = "LSP" })
+        elseif last_diag_count > 0 and current_count == 0 then
+          vim.notify("Erros corrigidos.", vim.log.levels.INFO, { title = "LSP" })
+          vim.fn.setqflist({})
+        end
+        last_diag_count = current_count
+      end
+    end
+  end,
+})

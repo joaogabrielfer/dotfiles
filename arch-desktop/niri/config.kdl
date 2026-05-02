@@ -94,7 +94,7 @@ binds {
     Mod+F { maximize-window-to-edges; }
     Mod+Escape { spawn "hyprlock"; }
     Mod+S { spawn "sh" "-c" "~/.config/scripts/tmux-sessions.sh"; }
-    Mod+Shift+T { spawn "sh" "-c" "~/.config/scripts/tmux-launcher.sh"; } //todo: arrumar isso aqui
+    Mod+Shift+N { spawn "sh" "-c" "~/.config/scripts/tmux-launcher.sh"; } //todo: arrumar isso aqui
     Mod+Shift+S { screenshot ; }
     Mod+Print { spawn "sh" "-c" "hyprshot -m active -m window -o ~/Pictures/screenshots"; }
 	Mod+Tab { toggle-overview; }

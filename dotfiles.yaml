@@ -61,6 +61,7 @@ targets:
                 - fuzzel
         links:
             arch-desktop/alacritty: ~/.config/alacritty
+            arch-desktop/fuzzel: /home/joaogabriel/.config/fuzzel
             arch-desktop/ghostty: ~/.config/ghostty
             arch-desktop/hypr: ~/.config/hypr
             arch-desktop/niri: ~/.config/niri
