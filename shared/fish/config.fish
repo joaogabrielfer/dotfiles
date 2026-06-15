@@ -13,6 +13,16 @@ fish_add_path $HOME/go/bin
 fish_add_path $HOME/.cargo/bin
 fish_add_path $HOME/.local/bin
 
+set -gx --path XDG_DATA_DIRS $XDG_DATA_DIRS
+
+# Append Flatpak share directories if they aren't already present
+for flatpak_dir in ~/.local/share/flatpak/exports/share /var/lib/flatpak/exports/share
+    if test -d $flatpak_dir
+        and not contains $flatpak_dir $XDG_DATA_DIRS
+        set -ga XDG_DATA_DIRS $flatpak_dir
+    end
+end
+
 # -------------------------------------------------------------------
 # Aliases
 # -------------------------------------------------------------------
@@ -50,3 +60,5 @@ fzf --fish | source
 
 set -g __fish_git_prompt_color_branch brmagenta -i # -i Sets italics mode
 set -g __fish_git_prompt_showupstream none
+
+set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; set -gx PATH $HOME/.cabal/bin /home/joaogabriel/.ghcup/bin $PATH # ghcup-env

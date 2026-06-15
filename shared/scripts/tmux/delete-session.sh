@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-current_session=$(tmux display-message -p '#s')
+current_session=$(tmux display-message -p '#S')
 all_sessions=$(tmux list-sessions -F '#S')
 if [ -z "$all_sessions" ]; then
     echo "Error: This script must be run from within a tmux session."
@@ -8,7 +8,7 @@ if [ -z "$all_sessions" ]; then
 fi
 
 kill_session() {
-	current_session=$(tmux display-message -p '#s')
+	current_session=$(tmux display-message -p '#S')
 	all_sessions=$(tmux list-sessions -F '#S')
 	session_to_kill=$(echo "$all_sessions" | fuzzel -d --prompt="Select a session to kill: ")
 
@@ -17,15 +17,14 @@ kill_session() {
 	fi
 
 	if [ "$session_to_kill" == "$current_session" ]; then
-		session_count=$(echo "$all_sessions" | wc -l)
+		switch_to_session=$(echo "$all_sessions" | grep -Fxv -- "$session_to_kill" | head -n 1)
 
-		if [ "$session_count" -gt 1 ]; then
-			tmux switch-client -n
+		if [ -n "$switch_to_session" ]; then
+			tmux switch-client -t "$switch_to_session"
 			tmux kill-session -t "$session_to_kill"
-			tmux display-message "Switched away from and deleted session '$session_to_kill'."
+			tmux display-message "Switched to '$switch_to_session' and deleted session '$session_to_kill'."
 		else
-			tmux display-message "Deleting last session '$session_to_kill'."
-			tmux kill-session -t "$session_to_kill"
+			tmux display-message "Cannot delete current session '$session_to_kill' because it is the last session."
 		fi
 		kill_session
 	else

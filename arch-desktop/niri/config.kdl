@@ -8,28 +8,17 @@ spawn-at-startup "udiskie"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "waypaper" "--restore"
 spawn-at-startup "systemctl" "--user" "start" "vicinae"
+spawn-at-startup "python3" "/home/joaogabriel/.config/scripts/obsidian/notify-daily-tasks.py"
+spawn-at-startup "python3" "/home/joaogabriel/.config/scripts/obsidian/task-generator.py"
+// spawn-at-startup "dbus-update-activation-environment" "--systemd" "DISPLAY" "XAUTHORITY" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
+spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP=niri"
+spawn-at-startup "sh" "-c" "pkill -f xdg-desktop-portal-gnome"
+spawn-at-startup "xwayland-satellite"
 prefer-no-csd
 
-// workspace "browser"
-// window-rule {
-//     match app-id="zen-browser"
-//
-//     // Forces the window to open on your named workspace
-//     open-on-workspace "browser"
-//
-//     // Sets the window to full screen upon opening
-//  	open-maximized-to-edges true
-// }
-// workspace "terminal"
-// window-rule {
-//     match app-id="Alacritty"
-//
-//     // Forces the window to open on your named workspace
-//     open-on-workspace "terminal"
-//
-//     // Sets the window to full screen upon opening
-//  	open-maximized-to-edges true
-// }
+environment {
+    DISPLAY ":1"
+}
 
 window-rule {
 	geometry-corner-radius 8
@@ -37,6 +26,17 @@ window-rule {
 	draw-border-with-background false
 }
 
+hotkey-overlay {
+    // Avoid auto-showing the important hotkeys menu.
+    skip-at-startup
+}
+
+window-rule {
+    match app-id=r#"^mpv$"#
+    match app-id=r#"firefox$"# title=r#"^(Picture-in-Picture|Library|About Mozilla Firefox)$"#
+
+    open-floating true
+}
 
 input {
     keyboard {
@@ -45,7 +45,7 @@ input {
             variant "abnt2"
             model "abnt2"
         }
-        repeat-delay 200
+        repeat-delay 250
         repeat-rate 25
     }
 
@@ -84,24 +84,26 @@ animations {
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // Mod is a special modifier that defaults to Super.
-    Mod+B { spawn "zen-browser"; }
-    Mod+T { spawn "alacritty"; }
-    Mod+Return { spawn "vicinae" "toggle"; }
-    Mod+Q { close-window; }
-    Mod+M { quit; }
-    Mod+E { spawn "thunar"; }
-    Mod+V { toggle-window-floating; }
-    Mod+F { maximize-window-to-edges; }
-    Mod+Escape { spawn "hyprlock"; }
-    Mod+S { spawn "sh" "-c" "~/.config/scripts/tmux-sessions.sh"; }
-    Mod+Shift+N { spawn "sh" "-c" "~/.config/scripts/tmux-launcher.sh"; } //todo: arrumar isso aqui
-    Mod+Shift+S { screenshot ; }
-    Mod+Print { spawn "sh" "-c" "hyprshot -m active -m window -o ~/Pictures/screenshots"; }
-	Mod+Tab { toggle-overview; }
-	Mod+A{ spawn "~/.config/niri/scripts/toggle-audio.sh"; }
-	// Mod+D { spawn "sh" "-c" "~/.config/hypr/scripts/toggle_special.sh"; }
-    // Mod+Y { spawn "swaync-client" "-t" "-R" "-rs"; }
-    // Mod+O { spawn "sh" "-c" "~/.config/scripts/launch-browser-obsidian.sh"; }
+	Mod+Shift+Slash { show-hotkey-overlay; }
+    Mod+B           { spawn "zen-browser"; }
+    Mod+T           { spawn "alacritty"; }
+    Mod+Return      { spawn "vicinae" "toggle"; }
+	Mod+E           { spawn "thunar"; }
+	Mod+S           { spawn "sh" "-c" "~/.config/scripts/tmux-sessions.sh"; }
+	Mod+Shift+N     { spawn "sh" "-c" "~/.config/scripts/tmux-launcher.sh"; }
+	Mod+O           { spawn "xdg-open" "vicinae://launch/@joaogabriel/obsidian-vicinae-menu/index"; }
+	Mod+A           { spawn "~/.config/niri/scripts/toggle-audio.sh"; }
+	Mod+Print       { spawn "sh" "-c" "hyprshot -m active -m window -o ~/Pictures/screenshots"; }
+	Mod+Shift+S     { screenshot ; }
+	Mod+V           { toggle-window-floating; }
+	Mod+F           { maximize-window-to-edges; }
+	Mod+SHIFT+F     { fullscreen-window; }
+    Mod+Q           { close-window; }
+	Mod+Tab         { toggle-overview; }
+	Mod+M           { quit; }
+	Mod+Escape      { spawn "hyprlock"; }
+	// Mod+D        { spawn "sh" "-c" "~/.config/hypr/scripts/toggle_special.sh"; }
+    // Mod+Y        { spawn "swaync-client" "-t" "-R" "-rs"; }
 
     // Focus bindings
     Mod+H { focus-column-left; }
@@ -117,7 +119,13 @@ binds {
 
 	Mod+Control+H{ set-column-width "-3%"; }
 	Mod+Control+L{ set-column-width "+3%"; }
+	Mod+Control+COMMA{ set-column-width "-1%"; }
+	Mod+Control+PERIOD{ set-column-width "+1%"; }
 
+	Mod+Control+J{ spawn "bash" "-c" "~/.config/scripts/niri/fit_to_screen.sh"; }
+	Mod+Control+K{ spawn "bash" "-c" "~/.config/scripts/niri/focus_mode.sh"; }
+
+	Mod+Control+T{ set-column-width "25%"; }
 	Mod+Control+Y{ set-column-width "34%"; }
 	Mod+Control+U{ set-column-width "50%"; }
 	Mod+Control+I{ set-column-width "66%"; }

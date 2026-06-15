@@ -9,7 +9,7 @@ LAUNCHER="fuzzel --dmenu --width 35% --lines 15 --prompt 'Mudar para:'"
 terminal="alacritty"
 
 launcher_input() {
-    fuzzel --dmenu --width 400 --lines 10 --prompt "$1" --cache-file /dev/null
+    fuzzel --dmenu --width 40 --lines 2 --prompt "$1"
 }
 
 initial_list=$( (
@@ -105,6 +105,7 @@ elif [[ "$selected_dir" == "programming" ]]; then
         [ -z "$category_display" ] && exit 0
         
         category_path="$PERSONAL_DIR/$category_display"
+		echo aqui
         project_name=$(echo "" | launcher_input "Nome do novo projeto:")
         [ -z "$project_name" ] && exit 1
 

@@ -31,6 +31,7 @@ function run --description "Compile and run a single-file program (defaults: gcc
     end
 
     # Compile and run
+	echo "RUNNING: $compiler_cmd $source $build_flags -o $output"
     if eval "$compiler_cmd" "$source" "$build_flags" -o "$output"
         "$output" $argv[2..-1]
     else
