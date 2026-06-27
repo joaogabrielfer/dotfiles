@@ -4,9 +4,9 @@
 program = "/usr/bin/fish"
 
 [window]
-opacity = 0.8
+opacity = 0.75
 blur = true
-padding = { x = 10, y = 10 }
+padding = { x = 8, y = 8 }
 dynamic_title = true
 
 [font]

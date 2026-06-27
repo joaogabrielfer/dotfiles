@@ -4,7 +4,7 @@
 set -gx XDG_CONFIG_HOME "$HOME/.config"
 set -gx EDITOR nvim
 set -gx MANPAGER "nvim +Man!"
-set -gx HYPRSHOT_DIR "$HOME/Pictures/screenshots"
+set -gx HYPRSHOT_DIR "$HOME/pictures/screenshots"
 
 # -------------------------------------------------------------------
 # Path
@@ -22,6 +22,9 @@ for flatpak_dir in ~/.local/share/flatpak/exports/share /var/lib/flatpak/exports
         set -ga XDG_DATA_DIRS $flatpak_dir
     end
 end
+
+# sourcing files
+source ~/.config/fish/completions/dms_completion.fish
 
 # -------------------------------------------------------------------
 # Aliases
@@ -56,7 +59,30 @@ set -g fish_cursor_visual block
 
 bind -M insert \cf forward-char
 
-fzf --fish | source
+if status is-interactive
+    # Disable fzf's default Ctrl-T binding before loading integration
+    set -gx FZF_CTRL_T_COMMAND ''
+
+    fzf --fish | source
+
+    # File path picker: Ctrl-x Ctrl-F
+	bind \cx\cf fzf-file-widget
+	bind -M insert \cx\cf fzf-file-widget
+
+    set -gx FZF_DEFAULT_OPTS "
+        --height 40%
+        --layout=reverse
+        --border
+    "
+
+    set -gx FZF_CTRL_T_OPTS "
+        --preview 'bat --style=numbers --color=always {} 2>/dev/null || eza -la --color=always {} 2>/dev/null'
+    "
+
+    set -gx FZF_ALT_C_OPTS "
+        --preview 'eza -la --color=always {} 2>/dev/null'
+    "
+end
 
 set -g __fish_git_prompt_color_branch brmagenta -i # -i Sets italics mode
 set -g __fish_git_prompt_showupstream none

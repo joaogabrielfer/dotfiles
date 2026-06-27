@@ -23,6 +23,7 @@ kill_session() {
 			tmux switch-client -t "$switch_to_session"
 			tmux kill-session -t "$session_to_kill"
 			tmux display-message "Switched to '$switch_to_session' and deleted session '$session_to_kill'."
+			kill_session
 		else
 			tmux display-message "Cannot delete current session '$session_to_kill' because it is the last session."
 		fi

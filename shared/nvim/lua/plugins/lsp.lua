@@ -43,6 +43,7 @@ return {
       }
     },
     config = function(_, opts)
+      vim.lsp.enable('gleam')
       require("mason").setup()
       require("mason-lspconfig").setup({
         ensure_installed = { "lua_ls", "clangd", "gopls" },

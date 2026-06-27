@@ -34,6 +34,7 @@ hotkey-overlay {
 window-rule {
     match app-id=r#"^mpv$"#
     match app-id=r#"firefox$"# title=r#"^(Picture-in-Picture|Library|About Mozilla Firefox)$"#
+	match app-id="yazi-float"
 
     open-floating true
 }
@@ -88,7 +89,8 @@ binds {
     Mod+B           { spawn "zen-browser"; }
     Mod+T           { spawn "alacritty"; }
     Mod+Return      { spawn "vicinae" "toggle"; }
-	Mod+E           { spawn "thunar"; }
+	// Mod+E           { spawn "thunar"; }
+	Mod+E           { spawn "alacritty" "--class" "yazi-float" "-e" "yazi"; }
 	Mod+S           { spawn "sh" "-c" "~/.config/scripts/tmux-sessions.sh"; }
 	Mod+Shift+N     { spawn "sh" "-c" "~/.config/scripts/tmux-launcher.sh"; }
 	Mod+O           { spawn "xdg-open" "vicinae://launch/@joaogabriel/obsidian-vicinae-menu/index"; }

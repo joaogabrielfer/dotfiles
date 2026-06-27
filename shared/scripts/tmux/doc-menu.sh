@@ -11,5 +11,6 @@ tmux menu \
     -s "fg=${text}" \
     -S "fg=${peach}" \
     -H "fg=${text}" \
-    "man"             m "neww -n man ~/.config/scripts/tmux/legacy/man.sh"\
-    "go doc"          g "neww -n man ~/.config/scripts/tmux/legacy/go-doc.sh"
+    "man"             m "neww -n man ~/.config/scripts/tmux/docs/man.sh"\
+    "go doc"          g "neww -n doc ~/.config/scripts/tmux/docs/go-doc.sh"\
+    "cheatsheet"      c "neww -n doc ~/.config/scripts/tmux/docs/cheat-sheet-doc.sh"

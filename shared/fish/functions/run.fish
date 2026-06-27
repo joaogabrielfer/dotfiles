@@ -1,6 +1,7 @@
 function run --description "Compile and run a single-file program (defaults: gcc, .c, builds/)"
     if test (count $argv) -lt 1
         echo "Error: Missing filename."
+        echo "Env vars: \$compiler, \$ext, \$dir, \$flags"
         echo "Usage: run <filename_without_extension> [program_arguments...]"
         return 1
     end

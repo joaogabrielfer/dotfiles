@@ -83,7 +83,7 @@ return {
       "bash", "c", "html", "javascript", "json",
       "lua", "markdown", "markdown_inline", "python",
       "query", "regex", "rust", "toml", "tsx", "typescript",
-      "vim", "vimdoc", "yaml", "pasm",
+      "vim", "vimdoc", "yaml", "pasm", "gleam",
     }
 
     -- Only install parsers that are not already available.
