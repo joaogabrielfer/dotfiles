@@ -7,37 +7,33 @@ local function merge(a, b)
 end
 
 local function float_center_title(pattern, extra)
-    extra = extra or {}
-    hl.window_rule(merge( {
+    hl.window_rule(merge({
         match = { title = pattern },
         float = true,
         center = true,
-    }, extra))
+    }, extra or {}))
 end
 
 local function float_center_class(pattern, extra)
-    extra = extra or {}
     hl.window_rule(merge({
         match = { class = pattern },
         float = true,
         center = true,
-    }, extra))
+    }, extra or {}))
 end
 
 local function float_title(pattern, extra)
-    extra = extra or {}
     hl.window_rule(merge({
         match = { title = pattern },
         float = true,
-    }, extra))
+    }, extra or {}))
 end
 
 local function float_class(pattern, extra)
-    extra = extra or {}
     hl.window_rule(merge({
         match = { class = pattern },
         float = true,
-    }, extra))
+    }, extra or {}))
 end
 
 -- File dialogs / portals
@@ -224,3 +220,51 @@ hl.layer_rule({
     match = { namespace = "^dms:.*" },
     no_anim = true,
 })
+
+
+
+-- PORTALS
+
+-- File picker / portal dialogs
+
+local file_picker_size = {
+    size = { "monitor_w * 0.60", "monitor_h * 0.65" },
+}
+
+float_center_title([[^(Open File)(.*)$]], file_picker_size)
+float_center_title([[^(Open Files)(.*)$]], file_picker_size)
+float_center_title([[^(Select a File)(.*)$]], file_picker_size)
+float_center_title([[^(Select Files)(.*)$]], file_picker_size)
+float_center_title([[^(Choose File)(.*)$]], file_picker_size)
+float_center_title([[^(Choose Files)(.*)$]], file_picker_size)
+float_center_title([[^(File Upload)(.*)$]], file_picker_size)
+float_center_title([[^(Open Folder)(.*)$]], file_picker_size)
+float_center_title([[^(Select Folder)(.*)$]], file_picker_size)
+float_center_title([[^(Save File)(.*)$]], file_picker_size)
+float_center_title([[^(Save As)(.*)$]], file_picker_size)
+float_center_title([[(.*)(wants to open)$]], file_picker_size)
+float_center_title([[(.*)(wants to save)$]], file_picker_size)
+
+-- GNOME / GTK portal windows
+float_center_class([[^(xdg-desktop-portal-gnome)$]], file_picker_size)
+float_center_class([[^(org\.freedesktop\.impl\.portal\.desktop\.gnome)$]], file_picker_size)
+float_center_class([[^(org\.freedesktop\.impl\.portal\.desktop\.gtk)$]], file_picker_size)
+float_center_class([[^(org\.gnome\.Nautilus)$]], file_picker_size)
+
+local portal_selector_size = {
+    size = { "monitor_w * 0.45", "monitor_h * 0.45" },
+}
+
+float_center_title([[^(Screen Sharing)(.*)$]], portal_selector_size)
+float_center_title([[^(Share Screen)(.*)$]], portal_selector_size)
+float_center_title([[^(Share your screen)(.*)$]], portal_selector_size)
+float_center_title([[^(Choose what to share)(.*)$]], portal_selector_size)
+float_center_title([[^(Select a monitor)(.*)$]], portal_selector_size)
+float_center_title([[^(Select a window)(.*)$]], portal_selector_size)
+float_center_title([[^(Select source)(.*)$]], portal_selector_size)
+float_center_title([[^(Screenshot)(.*)$]], portal_selector_size)
+float_center_title([[^(Take Screenshot)(.*)$]], portal_selector_size)
+
+float_center_class([[^(xdg-desktop-portal-hyprland)$]], portal_selector_size)
+float_center_class([[^(org\.freedesktop\.impl\.portal\.desktop\.hyprland)$]], portal_selector_size)
+float_center_class([[^(hyprland-share-picker)$]], portal_selector_size)

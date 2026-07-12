@@ -1,4 +1,4 @@
-@import "mocha.css";
+@import "theme.generated.css";
 
 * {
     font-family: "SF Pro Text", "JetBrains Mono Light", "Geist Mono", "MesloLGS NF";
@@ -9,9 +9,9 @@
 }
 
 window#waybar {
-    background-color: rgba(17, 17, 27, 0.7);
+    background-color: alpha(@crust, 0.7);
     color: @text;
-    border-bottom: 1px solid rgba(250, 179, 135, 0.2);
+    border-bottom: 1px solid alpha(@accent, 0.2);
 }
 
 /* ───────────── SEPARADOR ───────────── */
@@ -33,7 +33,7 @@ window#waybar {
 
 /* vazio */
 #workspaces button.empty {
-    color: rgba(69, 71, 90, 0.45);
+    color: alpha(@surface1, 0.45);
 }
 
 /* 2️⃣ OCUPADO / INATIVO */
@@ -43,15 +43,15 @@ window#waybar {
 
 /* ativo */
 #workspaces button.active {
-    color: @peach;
-    background-color: rgba(250, 179, 135, 0.15);
-    border-bottom: 2px solid @peach;
+    color: @accent;
+    background-color: alpha(@accent, 0.15);
+    border-bottom: 2px solid @accent;
 	padding: 0px 10px;
 }
 
 /* Home (workspace 11) nunca some totalmente */
 #workspaces-home button.persistent {
-    color: rgba(250, 179, 135, 0.35);
+    color: alpha(@accent, 0.35);
 }
 
 /* ───────────── JANELA ───────────── */
@@ -71,13 +71,13 @@ window#waybar {
     padding: 0 12px;
     margin: 5px 3px;
     border-radius: 8px;
-    background-color: rgba(205, 214, 244, 0.05);
+    background-color: alpha(@text, 0.05);
 }
 
 #network,
 #custom-audio-switcher,
 #clock {
-    color: @peach;
+    color: @accent;
 }
 
 #pulseaudio {
@@ -90,7 +90,7 @@ window#waybar {
 
 #custom-power {
     color: @red;
-    background-color: rgba(243, 139, 168, 0.1);
+    background-color: alpha(@red, 0.1);
     font-size: 15px;
     margin-right: 10px;
 	padding-right: 15px;
@@ -103,14 +103,14 @@ window#waybar {
 	padding: 0px 4px;
 	border-radius: 10%;
 
-    color: rgba(250, 179, 135, 0.6); 
+    color: alpha(@accent, 0.6);
     transition: all 0.3s ease;
 }
 
 #custom-home.active {
-    color: #fab387; /* Exemplo de cor sólida */
-    background-color: rgba(250, 179, 135, 0.15);
-    border-bottom: 2px solid #fab387; /* Exemplo de cor sólida */
+    color: @accent;
+    background-color: alpha(@accent, 0.15);
+    border-bottom: 2px solid @accent;
 
 	padding-top: 4px;
 	padding-left: 12px;
@@ -118,6 +118,5 @@ window#waybar {
 }
 
 #custom-home:hover {
-    color: @peach;
+    color: @accent;
 }
-

@@ -9,6 +9,19 @@ hl.bind(main_mod .. " + B        ", hl.dsp.exec_cmd(programs.browser))
 hl.bind(main_mod .. " + T        ", hl.dsp.exec_cmd(programs.terminal))
 hl.bind(main_mod .. " + SHIFT + T", hl.dsp.exec_cmd("alacritty --class floating-term -o 'window.opacity = 0.7'"))
 hl.bind(main_mod .. " + Return   ", hl.dsp.exec_cmd(programs.menu))
+-- hl.bind(main_mod .. " + SPACE        ", hl.dsp.exec_cmd("xdg-open vicinae://launch/@franzwilhelm/store.raycast.search-router/search?context=%7B%7D'"))
+local island_ipc = "qs -p /home/joaogabriel/personal/programming/langs/quickshell/teste ipc call island "
+
+-- hl.on("input.keyboard.key", function (key, time, mode)
+--
+-- end)
+hl.bind("SUPER + Super_L", hl.dsp.exec_cmd(island_ipc .. "collapse"), {
+  release = true, non_consuming = true,
+})
+hl.bind("SUPER + Super_L", hl.dsp.exec_cmd(island_ipc .. "expand"), {
+  repeating = true, non_consuming = true,
+})
+
 hl.bind(main_mod .. " + O        ", hl.dsp.exec_cmd("xdg-open vicinae://launch/@joaogabriel/obsidian-vicinae-menu/index"))
 
 local yazi_closing = false

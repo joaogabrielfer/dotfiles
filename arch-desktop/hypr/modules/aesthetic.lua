@@ -8,7 +8,7 @@ hl.config({
 	border_size = 1,
 
 	col = {
-	  active_border = colors.mauve,
+		  active_border = colors.accent,
 	  inactive_border = colors.base,
 	},
 
@@ -26,15 +26,18 @@ hl.config({
 	  inactive_opacity = 0.99,
 
 	  shadow = {
-		  enabled = false
+		  enabled = true,
+		  range = 20,
+		  render_power = 4,
+		  color = 0xee121212,
 	  },
 
 	  blur = {
 		  enabled = true,
-		  size = 3,
-		  passes = 2,
+		  size = 4,
+		  passes = 3,
 		  noise = 0.08,
-		  brightness = 1,
+		  brightness = 0.8,
 		  vibrancy = 0.25,
 	  },
   }

@@ -1,0 +1,138 @@
+#!/usr/bin/env lua
+
+local function quote(value)
+  return "'" .. value:gsub("'", "'\\''") .. "'"
+end
+
+local invoked_as = debug.getinfo(1, "S").source:sub(2)
+local readlink = assert(io.popen("readlink -f " .. quote(invoked_as)))
+local script = assert(readlink:read("*l"))
+readlink:close()
+local script_dir = script:match("^(.*)/[^/]+$")
+local shared_dir = script_dir:match("^(.*)/scripts$")
+local theme_dir = shared_dir .. "/themes"
+local palette_dir = theme_dir .. "/palettes"
+
+package.path = theme_dir .. "/?.lua;" .. package.path
+
+local schema = require("schema")
+local render = require("render")
+
+local home = assert(os.getenv("HOME"), "HOME is not set")
+local state_home = os.getenv("XDG_STATE_HOME") or home .. "/.local/state"
+local cache_home = os.getenv("XDG_CACHE_HOME") or home .. "/.cache"
+local state_dir = state_home .. "/dotfiles"
+local state_file = state_dir .. "/theme"
+local cache_dir = cache_home .. "/dotfiles/themes"
+local current_link = cache_dir .. "/current"
+
+local function run(command)
+  local ok, _, code = os.execute(command)
+  if ok ~= true and ok ~= 0 then
+    return nil, code
+  end
+  return true
+end
+
+local function load_theme(name)
+  assert(name and name:match("^[%w_-]+$"), "invalid theme name")
+  local chunk, message = loadfile(palette_dir .. "/" .. name .. ".lua")
+  assert(chunk, message)
+  return schema.validate(chunk(), name)
+end
+
+local function write(path, contents)
+  local temporary = path .. ".tmp." .. tostring(math.random(100000, 999999))
+  local file = assert(io.open(temporary, "w"))
+  assert(file:write(contents))
+  assert(file:close())
+  assert(os.rename(temporary, path))
+end
+
+local function generate(name)
+  local theme = load_theme(name)
+  local destination = cache_dir .. "/" .. name
+  assert(run("mkdir -p " .. quote(destination)))
+  for filename, contents in pairs(render.all(theme)) do
+    write(destination .. "/" .. filename, contents)
+  end
+  return theme, destination
+end
+
+local function link(source, destination)
+  assert(run("ln -sfn " .. quote(source) .. " " .. quote(destination)))
+end
+
+local function publish(name, destination)
+  assert(run("mkdir -p " .. quote(state_dir)))
+  link(destination, current_link)
+  write(state_file, name .. "\n")
+
+  local config = os.getenv("XDG_CONFIG_HOME") or home .. "/.config"
+  local links = {
+    [config .. "/alacritty/theme.generated.toml"] = current_link .. "/alacritty.toml",
+    [config .. "/hypr/theme.generated.conf"] = current_link .. "/hyprland.conf",
+    [config .. "/hypr/theme.generated.lua"] = current_link .. "/hyprland.lua",
+    [config .. "/tmux/theme.generated.conf"] = current_link .. "/tmux.conf",
+    [config .. "/waybar/theme.generated.css"] = current_link .. "/waybar.css",
+  }
+  for destination_path, source_path in pairs(links) do
+    link(source_path, destination_path)
+  end
+
+  local quickshell_dir = os.getenv("QUICKSHELL_THEME_DIR")
+  if quickshell_dir and quickshell_dir ~= "" then
+    assert(run("mkdir -p " .. quote(quickshell_dir)))
+    link(current_link .. "/Theme.qml", quickshell_dir .. "/Theme.qml")
+    link(current_link .. "/qmldir", quickshell_dir .. "/qmldir")
+  end
+end
+
+local function reload()
+  os.execute("hyprctl reload >/dev/null 2>&1")
+  os.execute("pkill -SIGUSR2 waybar >/dev/null 2>&1")
+  os.execute("tmux source-file ~/.config/tmux/tmux.conf >/dev/null 2>&1")
+end
+
+local function list()
+  local pipe = assert(io.popen("find " .. quote(palette_dir) .. " -maxdepth 1 -type f -name '*.lua' -printf '%f\\n'"))
+  local names = {}
+  for filename in pipe:lines() do
+    table.insert(names, assert(filename:match("^(.*)%.lua$")))
+  end
+  pipe:close()
+  table.sort(names)
+  print(table.concat(names, "\n"))
+end
+
+local function current()
+  local file = io.open(state_file)
+  if not file then
+    return
+  end
+  print(file:read("*l"))
+  file:close()
+end
+
+local command, name = arg[1], arg[2]
+if command == "list" then
+  list()
+elseif command == "current" then
+  current()
+elseif command == "validate" then
+  load_theme(assert(name, "theme name required"))
+  print(name .. " is valid")
+elseif command == "generate" then
+  local _, destination = generate(assert(name, "theme name required"))
+  print(destination)
+elseif command == "set" then
+  local _, destination = generate(assert(name, "theme name required"))
+  publish(name, destination)
+  reload()
+  print(name)
+elseif command == "reload" then
+  reload()
+else
+  io.stderr:write("usage: dot-theme {list|current|validate|generate|set|reload} [theme]\n")
+  os.exit(2)
+end
