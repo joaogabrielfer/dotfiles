@@ -8,7 +8,7 @@ hl.config({
 	border_size = 1,
 
 	col = {
-		  active_border = colors.accent,
+	  active_border = colors.accent,
 	  inactive_border = colors.base,
 	},
 
@@ -73,9 +73,9 @@ hl.curve("easy",           { type = "spring", mass = 1, stiffness = 71.2633, dam
 -- hl.animation({ leaf = "zoomFactor",    enabled = true,  speed = 7,    bezier = "quick" })
 
 
-hl.curve("macos_smooth", { type = "spring", mass = 1, stiffness = 85, dampening = 14, })
-hl.curve("macos_soft", { type = "spring", mass = 1, stiffness = 70, dampening = 16, })
-hl.curve("macos_snap", { type = "spring", mass = 1, stiffness = 110, dampening = 18, })
+hl.curve("macos_smooth", { type = "spring", mass = 1, stiffness = 450, dampening = 32 })
+hl.curve("macos_soft",   { type = "spring", mass = 1, stiffness = 350, dampening = 36 })
+hl.curve("macos_snap",   { type = "spring", mass = 1, stiffness = 550, dampening = 40 })
 
 -- Keep global animations enabled.
 hl.animation({ leaf = "global", enabled = true, speed = 1, spring = "macos_smooth", })

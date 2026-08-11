@@ -85,27 +85,24 @@ vim.api.nvim_create_autocmd("LspAttach", {
       vim.lsp.linked_editing_range.enable(true, { bufnr = bufnr, client_id = client.id })
     end
 
-    if vim.bo[bufnr].filetype ~= "rust" or client.name ~= "rust-analyzer" then
-      return
-    end
-
-    if client:supports_method("textDocument/inlayHint") then
+    if client.name == "rust-analyzer" and client:supports_method("textDocument/inlayHint") then
       vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
     end
 
-    if client:supports_method("textDocument/formatting") and not vim.b[bufnr].rust_format_on_save then
-      vim.b[bufnr].rust_format_on_save = true
+    local format_on_save = client.name == "hls" or client.name == "rust-analyzer"
+    if format_on_save and client:supports_method("textDocument/formatting") and not vim.b[bufnr].lsp_format_on_save then
+      vim.b[bufnr].lsp_format_on_save = true
       vim.api.nvim_create_autocmd("BufWritePre", {
-        group = vim.api.nvim_create_augroup("dotfiles.rust-format", { clear = false }),
+        group = vim.api.nvim_create_augroup("dotfiles.lsp-format", { clear = false }),
         buffer = bufnr,
         callback = function()
           local ok, message = pcall(vim.lsp.buf.format, {
             bufnr = bufnr,
-            id = client.id,
+            name = client.name,
             timeout_ms = 2000,
           })
           if not ok then
-            vim.notify("rustfmt failed: " .. tostring(message), vim.log.levels.WARN)
+            vim.notify(client.name .. " formatting failed: " .. tostring(message), vim.log.levels.WARN)
           end
         end,
       })

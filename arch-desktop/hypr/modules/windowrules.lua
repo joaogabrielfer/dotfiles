@@ -216,10 +216,18 @@ hl.window_rule({
 })
 
 hl.layer_rule({
-    name = "dms-no-animation",
-    match = { namespace = "^dms:.*" },
-    no_anim = true,
+    name = "quickshell-bar",
+    match = { namespace = "^quickshell-bar$" },
+    blur = true,
+    ignore_alpha = 0.1,
 })
+
+-- Deprecated during the Peach Quickshell migration:
+-- hl.layer_rule({
+--     name = "dms-no-animation",
+--     match = { namespace = "^dms:.*" },
+--     no_anim = true,
+-- })
 
 
 

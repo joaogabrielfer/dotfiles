@@ -6,6 +6,7 @@ M.servers = {
   "eslint",
   "gleam",
   "gopls",
+  "hls",
   "html",
   "lua_ls",
   "pyright",

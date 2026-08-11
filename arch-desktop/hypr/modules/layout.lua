@@ -48,3 +48,16 @@ hl.config({
 		fullscreen_on_one_column = true,
 	},
 })
+
+-- Hyprland 0.56 can leave the scrolling viewport slightly offset after a
+-- window exits fullscreen. Refit the active column after fullscreen state has
+-- settled; this automates the same correction that focusing left/right makes.
+hl.on("window.fullscreen", function(window)
+	if window.fullscreen ~= 0 or window ~= hl.get_active_window() then
+		return
+	end
+
+	hl.timer(function()
+		hl.dispatch(hl.dsp.layout("fit_into_view"))
+	end, { timeout = 1, type = "oneshot" })
+end)
