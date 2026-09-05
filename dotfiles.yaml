@@ -35,8 +35,6 @@ targets:
                 - imv
                 - nsxiv
                 - zen-browser-bin
-                - brave-bin
-                - zoom
                 - obsidian
                 - gimp
                 - raylib
@@ -56,12 +54,8 @@ targets:
                 - nvidia-open
                 - libva-nvidia-driver
                 - sddm
-                - niri
-                - dms-shell
-                - fuzzel
-        links:
-            arch-desktop/alacritty: ~/.config/alacritty
-            arch-desktop/fuzzel: /home/joaogabriel/.config/fuzzel
+            darch-desktop/alacritty: ~/.config/alacritty
+            arch-desktop/fuzzel: /home/joaogabriel/.config/fuzzeld
             arch-desktop/ghostty: ~/.config/ghostty
             arch-desktop/hypr: ~/.config/hypr
             arch-desktop/niri: ~/.config/niri

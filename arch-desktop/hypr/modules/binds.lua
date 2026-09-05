@@ -13,6 +13,7 @@ hl.bind(main_mod .. " + SHIFT + T", hl.dsp.exec_cmd("alacritty --class floating-
 -- hl.bind(main_mod .. " + Return   ", hl.dsp.exec_cmd(programs.menu))
 hl.bind(main_mod .. " + Return   ", hl.dsp.exec_cmd(island_ipc .. "launcher toggle"))
 -- hl.bind(main_mod .. " + SPACE        ", hl.dsp.exec_cmd("xdg-open vicinae://launch/@franzwilhelm/store.raycast.search-router/search?context=%7B%7D'"))
+-- hl.bind(main_mod .. " + Y", hl.dsp.exec_cmd("helium-browser --app=https://docs.rs", { float = true, size = {1000, 800}}))
 
 hl.on("input.keyboard.key", function (keycode, _, mode)
   if keycode == 133 then
@@ -110,8 +111,8 @@ hl.bind(main_mod .. " + SHIFT + N", hl.dsp.exec_cmd(island_ipc .. "launcher exec
 hl.bind(main_mod .. " + SHIFT + R", hl.dsp.exec_cmd(island_ipc .. "launcher exec tmux-delete-session"))
 
 -- MISC
-hl.bind(main_mod .. " + SHIFT + S", hl.dsp.exec_cmd("hyprshot -m region -o $HOME/pictures/screenshots -z"))
-hl.bind(main_mod .. " + Print    ", hl.dsp.exec_cmd("hyprshot -m active -m window -o $HOME/pictures/screenshots"))
+hl.bind(main_mod .. " + SHIFT + S", hl.dsp.exec_cmd("OMASNAP_SCREENSHOT_DIR=$HOME/pictures/screenshots omasnap --capture-region"))
+hl.bind(main_mod .. " + Print    ", hl.dsp.exec_cmd("OMASNAP_SCREENSHOT_DIR=$HOME/pictures/screenshots omasnap --capture-window"))
 hl.bind(main_mod .. " + A        ", hl.dsp.exec_cmd("~/.config/niri/scripts/toggle-audio.sh"))
 -- Deprecated until Peach Quickshell has a notification center:
 -- hl.bind(main_mod .. " + N        ", hl.dsp.exec_cmd("dms ipc call notifications toggle"))

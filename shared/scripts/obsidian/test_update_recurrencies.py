@@ -95,6 +95,33 @@ class UpdateRecurrencesTest(unittest.TestCase):
         self.assertIn("NOTE UPDATED", source.read_text(encoding="utf-8"))
         self.assertEqual(len(list(self.directory.glob("*.md"))), 2)
 
+    def test_recovers_inherited_marker_when_next_recurrence_is_missing(self) -> None:
+        source = self.directory / "legacy-generated-note.md"
+        source.write_text(
+            note("Tênis", "07/26", 1, body="NOTE UPDATED\n"), encoding="utf-8"
+        )
+
+        first_summary, first_output = self.run_processor("07/26")
+
+        self.assertEqual(first_summary.created, 1)
+        self.assertEqual(first_summary.updated, 0)
+        self.assertEqual(first_summary.recovered_stale_markers, 1)
+        self.assertIn("[RECOVERING]", first_output)
+        self.assertIn("[RECOVERED]", first_output)
+
+        generated = self.directory / "202607211230.md"
+        generated_content = generated.read_text(encoding="utf-8")
+        self.assertIn("card_date: 08/26", generated_content)
+        self.assertIn("remaining_mo: 0", generated_content)
+        self.assertNotIn("NOTE UPDATED", generated_content)
+
+        second_summary, second_output = self.run_processor("07/26")
+
+        self.assertEqual(second_summary.created, 0)
+        self.assertEqual(second_summary.already_processed, 1)
+        self.assertIn("202607211230.md exists", second_output)
+        self.assertEqual(len(list(self.directory.glob("*.md"))), 2)
+
     def test_zero_remaining_is_skipped_without_marking_source(self) -> None:
         source = self.directory / "complete.md"
         source.write_text(note("Jantar", "03/26", 0), encoding="utf-8")

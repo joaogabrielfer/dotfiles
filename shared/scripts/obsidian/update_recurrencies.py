@@ -28,6 +28,7 @@ class RunSummary:
     matching: int = 0
     created: int = 0
     updated: int = 0
+    recovered_stale_markers: int = 0
     already_processed: int = 0
     existing_recurrences: int = 0
     completed: int = 0
@@ -150,11 +151,6 @@ def process_directory(
         summary.matching += 1
         title = note_title(content, source_path.stem)
 
-        if PROCESSED_MARKER_PATTERN.search(content):
-            summary.already_processed += 1
-            print(f'[SKIPPED] {source_path.name} — "{title}" was already processed')
-            continue
-
         remaining_match = REMAINING_MONTHS_PATTERN.search(content)
         if remaining_match is None:
             summary.warnings += 1
@@ -168,10 +164,28 @@ def process_directory(
             continue
 
         new_date = next_card_date(card_date)
-        new_content = build_recurrence(content, remaining_months, new_date)
+        new_content = build_recurrence(
+            content_without_marker(content), remaining_months, new_date
+        )
         existing_path = find_existing_recurrence(
             note_paths, source_path, new_content
         )
+        has_processed_marker = PROCESSED_MARKER_PATTERN.search(content) is not None
+
+        if has_processed_marker and existing_path is not None:
+            summary.already_processed += 1
+            print(
+                f'[SKIPPED] {source_path.name} — "{title}" was already processed '
+                f"({existing_path.name} exists)"
+            )
+            continue
+
+        if has_processed_marker:
+            summary.recovered_stale_markers += 1
+            print(
+                f'[RECOVERING] {source_path.name} — "{title}" has a stale '
+                f"{PROCESSED_MARKER} marker; no {new_date} recurrence exists"
+            )
 
         if existing_path is not None:
             try:
@@ -193,7 +207,8 @@ def process_directory(
 
         try:
             new_path.write_text(new_content, encoding="utf-8")
-            source_path.write_text(add_processed_marker(content), encoding="utf-8")
+            if not has_processed_marker:
+                source_path.write_text(add_processed_marker(content), encoding="utf-8")
         except OSError as error:
             summary.errors += 1
             print(f'[ERROR]   {source_path.name} — could not process "{title}": {error}')
@@ -201,17 +216,27 @@ def process_directory(
 
         new_remaining = -1 if remaining_months == -1 else remaining_months - 1
         summary.created += 1
-        summary.updated += 1
         print(
             f'[CREATED] {new_path.name} — "{title}", '
             f"card_date {new_date}, remaining_mo {new_remaining}"
         )
-        print(f'[UPDATED] {source_path.name} — "{title}" marked {PROCESSED_MARKER}')
+        if has_processed_marker:
+            print(
+                f'[RECOVERED] {source_path.name} — "{title}" now has its '
+                f"missing {new_date} recurrence"
+            )
+        else:
+            summary.updated += 1
+            print(
+                f'[UPDATED] {source_path.name} — "{title}" marked '
+                f"{PROCESSED_MARKER}"
+            )
 
     print(
         "\nDone: "
         f"{summary.created} created, "
         f"{summary.updated} updated, "
+        f"{summary.recovered_stale_markers} stale markers recovered, "
         f"{summary.already_processed} already processed, "
         f"{summary.existing_recurrences} existing recurrences found, "
         f"{summary.completed} without recurrence, "
