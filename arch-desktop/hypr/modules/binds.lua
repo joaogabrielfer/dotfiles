@@ -6,25 +6,104 @@ local main_mod = "SUPER"
 
 local island_ipc = "qs -c island_shell ipc call "
 
+local function toggle_launcher_surface()
+  hl.dispatch(hl.dsp.exec_cmd(island_ipc .. "launcher toggle"))
+end
+
+local function toggle_menu_surface()
+  hl.dispatch(hl.dsp.exec_cmd(island_ipc .. "menu toggle"))
+end
+
 -- PROGRAMS
 hl.bind(main_mod .. " + B        ", hl.dsp.exec_cmd(programs.browser))
 hl.bind(main_mod .. " + T        ", hl.dsp.exec_cmd(programs.terminal))
 hl.bind(main_mod .. " + SHIFT + T", hl.dsp.exec_cmd("alacritty --class floating-term -o 'window.opacity = 0.7'"))
 -- hl.bind(main_mod .. " + Return   ", hl.dsp.exec_cmd(programs.menu))
-hl.bind(main_mod .. " + Return   ", hl.dsp.exec_cmd(island_ipc .. "launcher toggle"))
+hl.bind(main_mod .. " + Return   ", toggle_launcher_surface, { description = "Open launcher" })
+hl.bind(main_mod .. " + SPACE    ", toggle_menu_surface, { description = "Open shell menu" })
 -- hl.bind(main_mod .. " + SPACE        ", hl.dsp.exec_cmd("xdg-open vicinae://launch/@franzwilhelm/store.raycast.search-router/search?context=%7B%7D'"))
 -- hl.bind(main_mod .. " + Y", hl.dsp.exec_cmd("helium-browser --app=https://docs.rs", { float = true, size = {1000, 800}}))
 
-hl.on("input.keyboard.key", function (keycode, _, mode)
-  if keycode == 133 then
-	if mode == 0 then
-	  hl.dispatch(hl.dsp.exec_cmd(island_ipc .. "bar setExpanded false"))
-	end
-	if mode == 1 then
-	  hl.dispatch(hl.dsp.exec_cmd(island_ipc .. "bar setExpanded true"))
-	end
+-- Tap left Super, then press and hold it again to expand the island.
+-- A normal hold or a shortcut must not arm the next press.
+local super_down = false
+local super_tap = false
+local super_used_with_other_key = false
+local super_pending = false
+local super_generation = 0
+
+-- input.keyboard.key reports XKB keycodes: 133 is Super_L and 134 is
+-- Super_R.  Treat either physical Super key as the same gesture source.
+local function is_super_key(keycode)
+  return keycode == 133 or keycode == 134
+end
+
+local function menu_gesture(command)
+  hl.dispatch(hl.dsp.exec_cmd(island_ipc .. "menu " .. command))
+end
+
+local function cancel_super_gesture()
+  super_generation = super_generation + 1
+  super_tap = false
+  local had_pending = super_pending
+  super_pending = false
+  if super_down or had_pending then
+    if super_down then super_used_with_other_key = true end
+    menu_gesture("superCancel")
+  end
+end
+
+hl.on("input.keyboard.key", function(keycode, _, mode)
+  if not is_super_key(keycode) then
+    if mode == 1 then
+      if super_down then
+        super_used_with_other_key = true
+        super_tap = false
+        super_generation = super_generation + 1
+        menu_gesture("superCancel")
+      elseif super_pending then
+        -- A key pressed between the two Super taps disarms the shell-side
+        -- pending hold.  Keep this local flag short-lived to avoid an IPC
+        -- request for every unrelated key press.
+        super_pending = false
+        super_generation = super_generation + 1
+        menu_gesture("superCancel")
+      end
+    end
+    return
+  end
+
+  if mode == 1 and not super_down then
+    super_down = true
+    super_pending = false
+    super_used_with_other_key = false
+    super_generation = super_generation + 1
+    super_tap = true
+    menu_gesture("superDown")
+    local generation = super_generation
+    hl.timer(function()
+      if generation == super_generation then super_tap = false end
+    end, { timeout = 250, type = "oneshot" })
+  elseif mode == 0 and super_down then
+    super_down = false
+    local tap_eligible = super_tap
+    local used_with_other_key = super_used_with_other_key
+    super_tap = false
+    super_used_with_other_key = false
+    super_generation = super_generation + 1
+    menu_gesture("release " .. tostring(tap_eligible) .. " " .. tostring(used_with_other_key))
+    if tap_eligible and not used_with_other_key then
+      super_pending = true
+      local generation = super_generation
+      hl.timer(function()
+        if generation == super_generation then super_pending = false end
+      end, { timeout = 350, type = "oneshot" })
+    end
   end
 end)
+
+-- Also disarm after workspace changes made with Super + mouse wheel.
+hl.on("workspace.active", cancel_super_gesture)
 
 hl.bind(main_mod .. " + O        ", hl.dsp.exec_cmd(island_ipc .. "launcher exec obsidian-script"))
 
@@ -55,54 +134,8 @@ hl.bind(main_mod .. " + Escape", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(main_mod .. " + TAB   ", function() hl.plugin.hyproverview.toggle() end)
 
 hl.bind(main_mod .. " + SHIFT + F", hl.dsp.window.fullscreen({mode = "fullscreen"}))
-local fullscreen_on = false
-local original_config = {
-  gaps_in = hl.get_config("general.gaps_in"),
-  gaps_out = hl.get_config("general.gaps_out"),
-  border_size = hl.get_config("general.border_size"),
-  rounding = hl.get_config("decoration.rounding"),
-  brightness = hl.get_config("decoration.blur.brightness"),
-}
 hl.bind(main_mod .. " + F", function ()
-  hl.exec_cmd(island_ipc .. "bar toggleZenMode")
-  if fullscreen_on then
-	fullscreen_on = false
-	hl.config({
-	  general = {
-		gaps_in = original_config.gaps_in,
-		gaps_out = original_config.gaps_out,
-		border_size = original_config.border_size,
-	  },
-	  decoration = {
-		rounding = original_config.rounding,
-		shadow = {
-		  enabled = true,
-		},
-		blur = {
-		  brightness = original_config.brightness,
-		}
-	  },
-	})
-  else
-	fullscreen_on = true
-	hl.config({
-	  general = {
-		gaps_in = 0,
-		gaps_out = 0,
-		border_size = 0,
-	  },
-	  decoration = {
-		rounding = 0,
-		shadow = {
-		  enabled = false,
-		},
-		blur = {
-		  brightness = 0.5,
-		}
-	  },
-	})
-  end
-
+  hl.exec_cmd("$HOME/.config/quickshell/island_shell/scripts/set-zen-mode.sh toggle")
 end)
 
 -- TMUX
@@ -113,7 +146,7 @@ hl.bind(main_mod .. " + SHIFT + R", hl.dsp.exec_cmd(island_ipc .. "launcher exec
 -- MISC
 hl.bind(main_mod .. " + SHIFT + S", hl.dsp.exec_cmd("OMASNAP_SCREENSHOT_DIR=$HOME/pictures/screenshots omasnap --capture-region"))
 hl.bind(main_mod .. " + Print    ", hl.dsp.exec_cmd("OMASNAP_SCREENSHOT_DIR=$HOME/pictures/screenshots omasnap --capture-window"))
-hl.bind(main_mod .. " + A        ", hl.dsp.exec_cmd("~/.config/niri/scripts/toggle-audio.sh"))
+hl.bind(main_mod .. " + A        ", hl.dsp.exec_cmd(island_ipc .. "audio toggleOutput"), { description = "Toggle headphones or speakers" })
 -- Deprecated until Peach Quickshell has a notification center:
 -- hl.bind(main_mod .. " + N        ", hl.dsp.exec_cmd("dms ipc call notifications toggle"))
 

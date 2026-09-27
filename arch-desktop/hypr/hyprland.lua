@@ -8,3 +8,6 @@ require("modules.layout")
 require("modules.misc")
 require("modules.input")
 
+
+-- Capture/video tools and clipboard history.
+require("modules.capture")

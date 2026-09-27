@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Standalone Omarchy-inspired capture workflow; no Omarchy/Waybar dependency.
+set -euo pipefail
+umask 077
+need() {
+    command -v "$1" >/dev/null || { notify-send 'Capture tools' "Missing dependency: $1"; exit 1; }
+}
+video_dir=$(xdg-user-dir VIDEOS)
+video_dir="${SCREENRECORD_DIR:-$video_dir/Recordings}"
+unit=hypr-screenrecord.service
+state="${XDG_RUNTIME_DIR:?}/hypr-capture"
+mkdir -p "$state"
+case "${1:-menu}" in
+    record|record-desktop|record-mic|record-both|stop)
+        exec 9>"$state/lock"
+        flock -n 9 || exit 0
+        if systemctl --user is-active --quiet "$unit"; then
+            systemctl --user stop "$unit"
+            filename=$(cat "$state/filename")
+            if [[ -s $filename ]] && ffprobe -v error "$filename" >/dev/null 2>&1; then
+                notify-send 'Recording saved' "$filename"
+            else
+                notify-send -u critical 'Recording failed' "Check journalctl --user -u $unit"
+            fi
+            exit 0
+        fi
+        [[ $1 != stop ]] || exit 0
+        need gpu-screen-recorder
+        need slurp
+        # slurp and gpu-screen-recorder both use logical coordinates for regions.
+        geometry=$(slurp) || exit 0
+        [[ $geometry =~ ^(-?[0-9]+),(-?[0-9]+)[[:space:]]([0-9]+)x([0-9]+)$ ]] || exit 1
+        target="${BASH_REMATCH[3]}x${BASH_REMATCH[4]}+${BASH_REMATCH[1]}+${BASH_REMATCH[2]}"
+        audio=()
+        case $1 in
+            record-desktop) audio=(-a default_output -ac aac) ;;
+            record-mic) audio=(-a default_input -ac aac) ;;
+            record-both) audio=(-a 'default_output|default_input' -ac aac) ;;
+        esac
+        mkdir -p "$video_dir"
+        filename="$video_dir/recording-$(date +%Y-%m-%d_%H-%M-%S-%N).mp4"
+        printf '%s\n' "$filename" > "$state/filename"
+        systemd-run --user --quiet --collect --service-type=exec --unit="$unit" \
+            --property=PartOf=graphical-session.target --property=KillSignal=SIGINT \
+            --property=TimeoutStopSec=60 --property=UMask=0077 \
+            gpu-screen-recorder -w "$target" -k auto -f 60 -fm cfr \
+            -fallback-cpu-encoding yes -o "$filename" "${audio[@]}"
+        sleep 1
+        if systemctl --user is-active --quiet "$unit"; then
+            notify-send 'Recording started' 'Press Super + Alt + S to stop and save.'
+        else
+            notify-send -u critical 'Recording failed to start' "Check journalctl --user -u $unit"
+            exit 1
+        fi
+        ;;
+    edit)
+        need kdenlive
+        exec kdenlive
+        ;;
+    transcode)
+        need zenity
+        need ffmpeg
+        input=$(zenity --file-selection --title='Choose a video to convert to MP4') || exit 0
+        [[ -f $input ]] || exit 1
+        output=$(zenity --file-selection --save --title='Save MP4 copy' --filename="${input%.*}-converted.mp4") || exit 0
+        [[ -n $output ]] || exit 0
+        [[ $output == *.mp4 ]] || output+=.mp4
+        if [[ -e $output ]]; then
+            notify-send 'Conversion cancelled' 'Choose a new filename; existing files are preserved.'
+            exit 1
+        fi
+        notify-send 'Converting video' "$output"
+        # No overwrite; pad odd dimensions for H.264 compatibility.
+        if ffmpeg -nostdin -n -i "$input" -map 0:v:0 -map '0:a?' \
+            -vf 'pad=ceil(iw/2)*2:ceil(ih/2)*2' -c:v libx264 -preset medium -crf 23 \
+            -pix_fmt yuv420p -c:a aac -movflags +faststart "$output" \
+            >"$state/transcode-$$.log" 2>&1; then
+            notify-send 'Video converted' "$output"
+        else
+            notify-send -u critical 'Conversion failed' "See $state/transcode-$$.log (output may be incomplete)."
+            exit 1
+        fi
+        ;;
+    menu)
+        need wofi
+        choice=$(printf '%s\n' 'Record region (silent)' 'Record region + desktop audio' \
+            'Record region + microphone' 'Record region + desktop and microphone' \
+            'Stop recording' 'Open video editor' 'Convert video to MP4' 'Open recordings folder' \
+            | wofi --dmenu --prompt 'Capture and video') || exit 0
+        case $choice in
+            'Record region (silent)') exec "$0" record ;;
+            'Record region + desktop audio') exec "$0" record-desktop ;;
+            'Record region + microphone') exec "$0" record-mic ;;
+            'Record region + desktop and microphone') exec "$0" record-both ;;
+            'Stop recording') exec "$0" stop ;;
+            'Open video editor') exec "$0" edit ;;
+            'Convert video to MP4') exec "$0" transcode ;;
+            'Open recordings folder') mkdir -p "$video_dir"; exec xdg-open "$video_dir" ;;
+        esac
+        ;;
+    *) printf 'Usage: %s [menu|record|record-desktop|record-mic|record-both|stop|edit|transcode]\n' "$0" >&2; exit 2 ;;
+esac

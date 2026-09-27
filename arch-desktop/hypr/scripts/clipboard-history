@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+need() {
+    command -v "$1" >/dev/null || { notify-send "Clipboard history" "Missing dependency: $1"; exit 1; }
+}
+case "${1:-pick}" in
+    start)
+        need cliphist
+        need wl-paste
+        for mime in text image; do
+            unit="hypr-cliphist-$mime.service"
+            if ! systemctl --user is-active --quiet "$unit"; then
+                systemd-run --user --quiet --collect --unit="$unit" \
+                    --property=PartOf=graphical-session.target --property=Restart=on-failure \
+                    --property=UMask=0077 \
+                    wl-paste --type "$mime" --watch cliphist store
+            fi
+        done
+        ;;
+    pick)
+        need cliphist
+        need wofi
+        need wl-copy
+        # Cancel without replacing the current clipboard with an empty selection.
+        selection=$(cliphist list | wofi --dmenu --prompt 'Clipboard history') || exit 0
+        [[ -n $selection ]] || exit 0
+        temp=$(mktemp)
+        trap 'rm -f "$temp"' EXIT
+        printf '%s\n' "$selection" | cliphist decode > "$temp"
+        wl-copy < "$temp"
+        ;;
+    stop)
+        systemctl --user stop hypr-cliphist-text.service hypr-cliphist-image.service
+        ;;
+    *) printf 'Usage: %s [start|pick|stop]\n' "$0" >&2; exit 2 ;;
+esac

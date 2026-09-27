@@ -15,11 +15,11 @@ if [ "$CURRENT_PORT" == "$SPEAKERS_PORT" ]; then
     pactl set-sink-port "$SINK_NAME" "$HEADPHONES_PORT"
     
     notify-send -h string:x-canonical-private-synchronous:audio \
-                -t 2000 "Saída de Áudio" "🎧  <b>Fones de Ouvido</b>"
+                -t 2000 "Headphone audio"
 else
     # 1. Muda para os Alto-falantes
     pactl set-sink-port "$SINK_NAME" "$SPEAKERS_PORT"
     
     notify-send -h string:x-canonical-private-synchronous:audio \
-                -t 2000 "Saída de Áudio" "🔊  <b>Alto-falantes</b>"
+                -t 2000 "Speaker audio"
 fi
