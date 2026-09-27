@@ -33,8 +33,6 @@ func init() {
 	rootCmd.AddCommand(pushCmd)
 	rootCmd.AddCommand(addLinkCmd)
 	rootCmd.AddCommand(addPkgCmd)
-	rootCmd.AddCommand(listCmd)
-	rootCmd.AddCommand(targetsCmd)
 }
 
 func Execute() {

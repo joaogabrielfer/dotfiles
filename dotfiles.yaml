@@ -54,8 +54,9 @@ targets:
                 - nvidia-open
                 - libva-nvidia-driver
                 - sddm
-            darch-desktop/alacritty: ~/.config/alacritty
-            arch-desktop/fuzzel: /home/joaogabriel/.config/fuzzeld
+        links:
+            arch-desktop/alacritty: ~/.config/alacritty
+            arch-desktop/fuzzel: ~/.config/fuzzel
             arch-desktop/ghostty: ~/.config/ghostty
             arch-desktop/hypr: ~/.config/hypr
             arch-desktop/niri: ~/.config/niri

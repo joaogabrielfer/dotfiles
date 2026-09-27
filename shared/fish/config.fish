@@ -47,6 +47,7 @@ alias gl "git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%
 # -------------------------------------------------------------------
 
 set -g fish_greeting
+set -g fish_transient_prompt 1
 
 function fish_mode_prompt; end
 
@@ -85,6 +86,21 @@ if status is-interactive
 end
 
 set -g __fish_git_prompt_color_branch brmagenta -i # -i Sets italics mode
+set -g __fish_git_prompt_showcolorhints 1
 set -g __fish_git_prompt_showupstream none
+set -g __fish_git_prompt_showdirtystate 1
+set -g __fish_git_prompt_showuntrackedfiles 1
+set -g __fish_git_prompt_showstashstate 1
+set -g __fish_git_prompt_char_cleanstate ''
+set -g __fish_git_prompt_color_dirtystate red
+set -g __fish_git_prompt_color_stagedstate green
+set -g __fish_git_prompt_color_untrackedfiles yellow
+set -g __fish_git_prompt_color_invalidstate red
+set -g __fish_git_prompt_color_stashstate cyan
+set -e ___fish_git_prompt_init
+set -l __git_prompt_cache (set -n | string match -r '^___fish_git_prompt_(color|char)')
+if set -q __git_prompt_cache[1]
+    set -e $__git_prompt_cache
+end
 
 set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME ; set -gx PATH $HOME/.cabal/bin /home/joaogabriel/.ghcup/bin $PATH # ghcup-env

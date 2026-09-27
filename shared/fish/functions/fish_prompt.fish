@@ -1,57 +1,120 @@
-# function fish_prompt --description 'Write out the prompt'
-#         set -l last_status $status
-#         set -l normal (set_color --reset)
-#         set -l status_color (set_color brgreen)
-#         set -l cwd_color (set_color $fish_color_cwd)
-#         set -l vcs_color (set_color brpurple)
-#         set -l prompt_status ""
+# function fish_prompt
+#     set -l last_status $status
+# 	set_color white
+# 	printf "["
+#     set_color yellow
+# 	printf "%s " (whoami)
+# 	set_color white
+# 	printf "-> "
+#     set_color red
+#     printf "%s" (basename $(prompt_pwd))
+#     set_color white
+#     printf "]"
 #
-#         # Since we display the prompt on a new line allow the directory names to be longer.
-#         set -q fish_prompt_pwd_dir_length
-#         or set -lx fish_prompt_pwd_dir_length 0
+#     set -l git_info (fish_git_prompt)
+#     if test -n "$git_info"
+#         printf "%s" "$git_info"
+# 	end
 #
-#         # Color the prompt differently when we're root
-#         set -l suffix '❯'
-#         if functions -q fish_is_root_user; and fish_is_root_user
-#                 if set -q fish_color_cwd_root
-#                         set cwd_color (set_color $fish_color_cwd_root)
-#                 end
-#                 set suffix '#'
-#         end
-#
-#         # Color the prompt in red on error
-#         if test $last_status -ne 0
-#                 set status_color (set_color $fish_color_error)
-#                 set prompt_status $status_color "[" $last_status "]" $normal
-#         end
-#
-#         echo -s (prompt_login) ' ' $cwd_color (prompt_pwd) $vcs_color (fish_vcs_prompt) $normal ' ' $prompt_status
-#         echo -n -s $status_color $suffix ' ' $normal
+# 	if test $last_status -ne 0
+# 		set_color red
+# 	else
+# 		set_color green
+# 	end
+#     printf " ❯ "
+#     set_color normal
 # end
+
+set -g fish_transient_prompt 1
+
+function __prompt_pwd_display
+    set -l realpwd (pwd -P 2>/dev/null; or pwd)
+    set -l home $HOME
+    set -l projects "$home/personal/programming/projects"
+
+    if string match -q "$projects/*" -- $realpwd
+        or test $realpwd = $projects
+        set -l rest (string replace -r "^$projects/?" "" -- $realpwd)
+        if test -z "$rest"
+            printf '%s\n%s\n' purple "~projects"
+        else
+            printf '%s\n%s\n' purple $rest
+        end
+        return
+    end
+
+    printf '%s\n%s\n' blue (string replace -r "^$home" "~" -- $realpwd)
+end
 
 function fish_prompt
     set -l last_status $status
-	set_color white
-	printf "["
+
+    if contains -- --final-rendering $argv
+        if test $last_status -ne 0
+            set_color red
+        else
+            set_color green
+        end
+        printf '$ '
+        set_color normal
+        return
+    end
+
+    set -l sep_color brblack
+    set -l first 1
+
+    function __prompt_seg --no-scope-shadowing
+        if test $first -eq 0
+            set_color $sep_color
+            printf ' | '
+        end
+        set first 0
+    end
+
+    # user@host
+    __prompt_seg
     set_color yellow
-	printf "%s " (whoami)
-	set_color white
-	printf "-> "
-    set_color red
-    printf "%s" (basename $(prompt_pwd))
-    set_color white
-    printf "]"
+    printf '\uf007 %s' $USER
+    set_color $sep_color
+    printf '@'
+    set_color cyan
+    printf '%s' (prompt_hostname)
 
-    set -l git_info (fish_git_prompt)
+    # pwd
+    set -l pwd_info (__prompt_pwd_display)
+    __prompt_seg
+    set_color $pwd_info[1]
+    printf '\uf07c %s' $pwd_info[2]
+
+    # git
+    set -l git_info (fish_git_prompt ' %s')
     if test -n "$git_info"
-        printf "%s" "$git_info"
-	end
+        __prompt_seg
+        set_color magenta
+        printf '\ue725 (%s)' (string trim -- $git_info)
+    end
 
-	if test $last_status -ne 0
-		set_color red
-	else
-		set_color green
-	end
-    printf " ❯ "
+    # guix shell
+    if set -q GUIX_ENVIRONMENT
+        __prompt_seg
+        set_color green
+        printf '\uf1b2 guix'
+    end
+
+    # exit status
+    if test $last_status -ne 0
+        __prompt_seg
+        set_color red
+        printf '[%s]' $last_status
+    end
+
+    printf '\n'
+
+    if test $last_status -ne 0
+        set_color red
+    else
+        set_color green
+    end
+    printf '$ '
     set_color normal
 end
