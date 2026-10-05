@@ -89,7 +89,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
       vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
     end
 
-    local format_on_save = client.name == "hls" or client.name == "rust-analyzer"
+    local format_on_save = client.name == "hls" or client.name == "rust-analyzer" or client.name == "ocamllsp"
     if format_on_save and client:supports_method("textDocument/formatting") and not vim.b[bufnr].lsp_format_on_save then
       vim.b[bufnr].lsp_format_on_save = true
       vim.api.nvim_create_autocmd("BufWritePre", {

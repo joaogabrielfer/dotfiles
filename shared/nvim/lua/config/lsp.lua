@@ -9,6 +9,7 @@ M.servers = {
   "hls",
   "html",
   "lua_ls",
+  "ocamllsp",
   "pyright",
   "qmlls",
   "tailwindcss",
@@ -16,7 +17,7 @@ M.servers = {
 }
 
 M.mason_servers = vim.tbl_filter(function(server)
-  return server ~= "gleam"
+  return server ~= "gleam" and server ~= "ocamllsp"
 end, M.servers)
 
 function M.setup()
@@ -32,6 +33,10 @@ function M.setup()
         completion = { callSnippet = "Replace" },
       },
     },
+  })
+
+  vim.lsp.config("ocamllsp", {
+    cmd = { "opam", "exec", "--", "ocamllsp" },
   })
 
   vim.lsp.config("qmlls", {
