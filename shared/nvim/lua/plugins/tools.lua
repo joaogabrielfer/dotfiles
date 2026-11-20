@@ -1,15 +1,10 @@
-return {
-  {
-    "tpope/vim-fugitive",
-    cmd = { "Git", "G", "Gdiffsplit", "Gvdiffsplit" },
-    keys = {
-      { "<leader>gs", "<cmd>Git<cr>", desc = "Git status" },
-    },
-  },
-  {
-    "lewis6991/gitsigns.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    opts = {
+vim.keymap.set("n", "<leader>gs", "<cmd>Git<cr>", { desc = "Git status" })
+
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+  group = vim.api.nvim_create_augroup("dotfiles.gitsigns", { clear = true }),
+  once = true,
+  callback = function()
+    require("gitsigns").setup({
       current_line_blame = false,
       signcolumn = false,
       on_attach = function(bufnr)
@@ -40,6 +35,6 @@ return {
         buffer_map("n", "<leader>ghp", gitsigns.preview_hunk, "Preview Git hunk")
         buffer_map("n", "<leader>gb", gitsigns.toggle_current_line_blame, "Toggle Git blame")
       end,
-    },
-  },
-}
+    })
+  end,
+})

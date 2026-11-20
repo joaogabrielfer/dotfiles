@@ -6,6 +6,26 @@ set -gx EDITOR nvim
 set -gx MANPAGER "nvim +Man!"
 set -gx HYPRSHOT_DIR "$HOME/pictures/screenshots"
 
+if set -q NVIM
+    function nvim --wraps nvim --description 'Open files in parent Neovim instance'
+        if test (count $argv) -eq 0
+            command nvim
+            return
+        end
+        for arg in $argv
+            if string match -q -- '-*' $arg; or string match -q -- '+*' $arg
+                command nvim $argv
+                return
+            end
+        end
+        for file in $argv
+            set -l abs (realpath -m -- $file)
+            set -l escaped (string replace -a "'" "''" -- $abs)
+            command nvim --server "$NVIM" --remote-expr "v:lua.require('config.terminal').open_in_editor('$escaped')" >/dev/null
+        end
+    end
+end
+
 # -------------------------------------------------------------------
 # Path
 # -------------------------------------------------------------------

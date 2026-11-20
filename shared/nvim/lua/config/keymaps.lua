@@ -119,38 +119,36 @@ map("n", "<leader>xx", function()
   vim.fn.system({ "chmod", "+x", vim.api.nvim_buf_get_name(0) })
 end, { desc = "Make file executable" })
 
--- Open path in separate pane
-map("n", "<C-f>", function()
-  local target
-  if vim.bo.filetype == "oil" then
-    local oil = require("oil")
-    local entry = oil.get_cursor_entry()
-    local directory = oil.get_current_dir()
-    target = entry and directory and vim.fs.joinpath(directory, entry.name) or nil
-  else
-    local candidate = vim.fn.expand("<cfile>")
-    if vim.bo.filetype == "rust" then
-      local module = candidate:gsub(";$", "")
-      target = vim.fn.findfile(module .. ".rs")
-      if target == "" then
-        target = vim.fn.findfile(vim.fs.joinpath(module, "mod.rs"))
-      end
-    end
-    target = target ~= "" and target or vim.fn.findfile(candidate)
-    if target == "" then
-      target = vim.fn.finddir(candidate)
-    end
-    if target == "" then
-      target = candidate
-    end
-    target = vim.fn.fnamemodify(target, ":p")
-  end
+-- Terminal groups & unified pane navigation
+local terminal = require("config.terminal")
 
-  if not target or not vim.uv.fs_stat(target) then
-    vim.notify("Path not found: " .. tostring(target), vim.log.levels.WARN)
-    return
-  end
+map("n", "<C-t>", function()
+  local count = vim.v.count
+  terminal.toggle(count > 0 and count or nil)
+end, { silent = true, desc = "Toggle terminal group (count = slot)" })
 
-  local name = vim.fn.fnamemodify(target, ":t")
-  vim.system({ "tmux", "new-window", "-c", "#{pane_current_path}", "-n", name, "nvim", target })
-end, { desc = "Open path under cursor in tmux" })
+map("t", "<C-t>", function()
+  terminal.toggle(nil)
+end, { silent = true, desc = "Hide active terminal" })
+
+map({ "n", "t" }, "<C-S-t>", function()
+  terminal.context_shift_t()
+end, { silent = true, desc = "Split terminal pane or toggle float" })
+
+map("n", "<leader>tt", function()
+  terminal.pick_groups()
+end, { silent = true, desc = "Manage terminal groups" })
+
+for _, dir in ipairs({
+  { key = "h", dir = "h", name = "left" },
+  { key = "j", dir = "j", name = "down" },
+  { key = "k", dir = "k", name = "up" },
+  { key = "l", dir = "l", name = "right" },
+}) do
+  map("n", "<C-M-" .. dir.key .. ">", function()
+    terminal.navigate(dir.dir, false)
+  end, { silent = true, desc = "Move to " .. dir.name .. " pane" })
+  map("t", "<C-M-" .. dir.key .. ">", function()
+    terminal.navigate(dir.dir, true)
+  end, { silent = true, desc = "Move to " .. dir.name .. " pane" })
+end
