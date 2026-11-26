@@ -139,6 +139,31 @@ map("n", "<leader>tt", function()
   terminal.pick_groups()
 end, { silent = true, desc = "Manage terminal groups" })
 
+map("n", "<C-M-n>", function()
+  terminal.cycle_group(1, false)
+end, { silent = true, desc = "Next terminal group" })
+map("t", "<C-M-n>", function()
+  terminal.cycle_group(1, true)
+end, { silent = true, desc = "Next terminal group" })
+map("n", "<C-M-p>", function()
+  terminal.cycle_group(-1, false)
+end, { silent = true, desc = "Previous terminal group" })
+map("t", "<C-M-p>", function()
+  terminal.cycle_group(-1, true)
+end, { silent = true, desc = "Previous terminal group" })
+
+map("n", "<leader>tp", function()
+  terminal.cycle_position()
+end, { silent = true, desc = "Cycle terminal dock position" })
+
+map("n", "<leader>tz", function()
+  terminal.toggle_zoom()
+end, { silent = true, desc = "Toggle pane zoom" })
+
+map("n", "<leader>t=", function()
+  terminal.equalize()
+end, { silent = true, desc = "Equalize pane sizes" })
+
 for _, dir in ipairs({
   { key = "h", dir = "h", name = "left" },
   { key = "j", dir = "j", name = "down" },
@@ -151,4 +176,24 @@ for _, dir in ipairs({
   map("t", "<C-M-" .. dir.key .. ">", function()
     terminal.navigate(dir.dir, true)
   end, { silent = true, desc = "Move to " .. dir.name .. " pane" })
+  map("n", "<C-M-S-" .. dir.key .. ">", function()
+    terminal.move_pane(dir.dir, false)
+  end, { silent = true, desc = "Move/swap pane " .. dir.name })
+  map("t", "<C-M-S-" .. dir.key .. ">", function()
+    terminal.move_pane(dir.dir, true)
+  end, { silent = true, desc = "Move/swap pane " .. dir.name })
+end
+
+for _, arrow in ipairs({
+  { key = "Left", dir = "left" },
+  { key = "Right", dir = "right" },
+  { key = "Up", dir = "up" },
+  { key = "Down", dir = "down" },
+}) do
+  map("n", "<C-M-" .. arrow.key .. ">", function()
+    terminal.resize(arrow.dir, false)
+  end, { silent = true, desc = "Resize pane " .. arrow.dir })
+  map("t", "<C-M-" .. arrow.key .. ">", function()
+    terminal.resize(arrow.dir, true)
+  end, { silent = true, desc = "Resize pane " .. arrow.dir })
 end

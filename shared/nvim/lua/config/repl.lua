@@ -97,8 +97,22 @@ M.register({ "haskell", "lhaskell" }, {
   root = haskell_root,
   panes = {
     {
+      title = "ghcid",
+      ratio = 0.35,
+      auto_close = false,
+      cmd = function(ctx)
+        local kind = haskell_kind(ctx.root)
+        if kind == "stack" or kind == "cabal" then
+          return { "ghcid", "--clear" }
+        elseif ctx.file ~= "" then
+          return { "ghcid", "--clear", ctx.file }
+        end
+        return { "ghcid", "--clear" }
+      end,
+    },
+    {
       title = "ghci",
-      ratio = 0.55,
+      ratio = 0.65,
       repl = true,
       auto_close = false,
       cmd = function(ctx)
@@ -111,20 +125,6 @@ M.register({ "haskell", "lhaskell" }, {
           return { "ghci", ctx.file }
         end
         return { "ghci" }
-      end,
-    },
-    {
-      title = "ghcid",
-      ratio = 0.45,
-      auto_close = false,
-      cmd = function(ctx)
-        local kind = haskell_kind(ctx.root)
-        if kind == "stack" or kind == "cabal" then
-          return { "ghcid" }
-        elseif ctx.file ~= "" then
-          return { "ghcid", ctx.file }
-        end
-        return { "ghcid" }
       end,
     },
   },

@@ -24,6 +24,43 @@ if set -q NVIM
             command nvim --server "$NVIM" --remote-expr "v:lua.require('config.terminal').open_in_editor('$escaped')" >/dev/null
         end
     end
+
+    function __nvim_send_cmdline
+        set -l cur (commandline --cursor)
+        set -l cmd (commandline | string collect --no-trim-newlines | string escape --style=url)
+        printf '\e]1337;nvim_cmdline=%s;%s;%s\a' "$fish_pid" "$cur" "$cmd" >/dev/tty
+    end
+
+    function __nvim_apply_cmdline
+        set -l cmdfile "/tmp/nvim-fish-cmd-$fish_pid"
+        if not test -f "$cmdfile"
+            return
+        end
+        set -l header ""
+        set -l body ""
+        begin
+            read header
+            IFS="" read -z body
+        end <"$cmdfile"
+        rm -f "$cmdfile"
+        set -l parts (string split " " -- "$header")
+        set -l exec_flag $parts[1]
+        set -l cur_pos $parts[2]
+        commandline -r -- "$body"
+        if test -n "$cur_pos"
+            commandline --cursor -- "$cur_pos"
+        end
+        set -g fish_bind_mode insert
+        commandline -f repaint
+        if test "$exec_flag" = "1"
+            commandline -f execute
+        end
+    end
+
+    function __nvim_open_prompt
+        __nvim_send_cmdline
+        printf '\e]1337;nvim_open_prompt=%s\a' "$fish_pid" >/dev/tty
+    end
 end
 
 # -------------------------------------------------------------------
@@ -74,7 +111,12 @@ function fish_mode_prompt; end
 fish_vi_key_bindings
 
 set -g fish_cursor_default block
-set -g fish_cursor_insert block
+if set -q NVIM
+    set -g fish_cursor_insert line
+    set -g fish_cursor_external line
+else
+    set -g fish_cursor_insert block
+end
 set -g fish_cursor_replace_one underscore
 set -g fish_cursor_visual block
 
@@ -103,6 +145,18 @@ if status is-interactive
     set -gx FZF_ALT_C_OPTS "
         --preview 'eza -la --color=always {} 2>/dev/null'
     "
+
+    if set -q NVIM
+        bind -M insert ctrl-alt-shift-f11 __nvim_send_cmdline
+        bind -M default ctrl-alt-shift-f11 __nvim_send_cmdline
+        bind -M insert ctrl-alt-shift-f12 __nvim_apply_cmdline
+        bind -M default ctrl-alt-shift-f12 __nvim_apply_cmdline
+        bind -M insert alt-e __nvim_open_prompt
+        bind -M default alt-e __nvim_open_prompt
+        bind -M insert alt-v __nvim_open_prompt
+        bind -M default alt-v __nvim_open_prompt
+        printf '\e]1337;nvim_fish=%s\a' "$fish_pid" >/dev/tty
+    end
 end
 
 set -g __fish_git_prompt_color_branch brmagenta -i # -i Sets italics mode

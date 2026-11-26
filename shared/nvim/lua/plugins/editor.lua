@@ -1,7 +1,27 @@
 local map = vim.keymap.set
 
+local ROOT_MARKERS = {
+  ".git",
+  "Cargo.toml",
+  "go.mod",
+  "package.json",
+  "stack.yaml",
+  "cabal.project",
+  function(name)
+    return name:match("%.cabal$") ~= nil
+  end,
+}
+
 local function project_root()
-  return vim.fs.root(0, { ".git", "Cargo.toml", "go.mod", "package.json", "*.cabal", "stack.yaml" }) or vim.fn.getcwd()
+  local root = vim.fs.root(0, ROOT_MARKERS)
+  if root then
+    local norm = vim.fs.normalize(root)
+    local home = vim.fs.normalize(vim.uv.os_homedir() or "")
+    if norm ~= home and norm ~= "/" then
+      return root
+    end
+  end
+  return vim.fn.getcwd()
 end
 
 local function project_picker(name)
@@ -87,6 +107,14 @@ require("oil").setup({
 
 map("n", "-", "<cmd>Oil<cr>", { desc = "Oil parent directory" })
 map("n", "_", "<cmd>Oil .<cr>", { desc = "Oil working directory" })
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("dotfiles.oil-snacks-main", { clear = true }),
+  pattern = "oil",
+  callback = function(ev)
+    vim.b[ev.buf].snacks_main = true
+  end,
+})
 
 -- WhichKey (deferred to UIEnter)
 vim.api.nvim_create_autocmd("UIEnter", {

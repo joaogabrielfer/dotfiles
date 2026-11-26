@@ -1,8 +1,13 @@
 local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 
+-- Load nvim-treesitter's predicates first so that plugin/nvim-treesitter.lua
+-- (which Neovim sources after init.lua under vim.pack) cannot overwrite our
+-- Neovim 0.12+/0.13 compatibility overrides below.
+require("nvim-treesitter.query_predicates")
+
 -- nvim-treesitter master still registers some directives with the old
 -- capture shape. Neovim 0.12+ passes captures as TSNode[] lists, which
--- otherwise makes markdown injections pass a table to get_node_text().
+-- otherwise makes markdown/html injections pass a table to get_node_text().
 local query = require("vim.treesitter.query")
 local function first_capture(match, capture_id)
   local capture = match[capture_id]
@@ -20,9 +25,32 @@ local markdown_aliases = {
   ts = "typescript",
 }
 
+local html_mimetypes = {
+  ["importmap"] = "json",
+  ["module"] = "javascript",
+  ["application/ecmascript"] = "javascript",
+  ["text/ecmascript"] = "javascript",
+}
+
 local function parser_from_info_string(alias)
   return vim.filetype.match({ filename = "a." .. alias }) or markdown_aliases[alias] or alias
 end
+
+query.add_directive("set-lang-from-mimetype!", function(match, _, bufnr, pred, metadata)
+  local node = first_capture(match, pred[2])
+  if not node then
+    return
+  end
+
+  local value = vim.treesitter.get_node_text(node, bufnr)
+  local configured = html_mimetypes[value]
+  if configured then
+    metadata["injection.language"] = configured
+  else
+    local parts = vim.split(value, "/", {})
+    metadata["injection.language"] = parts[#parts]
+  end
+end, { force = true })
 
 query.add_directive("set-lang-from-info-string!", function(match, _, bufnr, pred, metadata)
   local node = first_capture(match, pred[2])

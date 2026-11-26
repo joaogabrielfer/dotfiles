@@ -103,4 +103,35 @@ chars = "\u001b9"
 [[keyboard.bindings]]
 key = "Back"
 mods = "Control"
-chars = "\u0017" 
+chars = "\u0017"
+
+# --- Extended keys (CSI-u) for Neovim / tmux ---
+[[keyboard.bindings]]
+key = "T"
+mods = "Control|Shift"
+chars = "\u001b[116;6u"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001b[13;2u"
+
+[[keyboard.bindings]]
+key = "H"
+mods = "Control|Alt|Shift"
+chars = "\u001b[104;8u"
+
+[[keyboard.bindings]]
+key = "J"
+mods = "Control|Alt|Shift"
+chars = "\u001b[106;8u"
+
+[[keyboard.bindings]]
+key = "K"
+mods = "Control|Alt|Shift"
+chars = "\u001b[107;8u"
+
+[[keyboard.bindings]]
+key = "L"
+mods = "Control|Alt|Shift"
+chars = "\u001b[108;8u"

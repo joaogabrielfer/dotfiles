@@ -8,6 +8,7 @@ opt.backup = false
 opt.clipboard = "unnamedplus"
 opt.completeopt = { "menuone", "noselect", "popup" }
 opt.confirm = true
+opt.guicursor = "n-v-c-sm:block,i-ci-ve:ver25,r-cr-o:hor20,t:ver25-TermCursor"
 opt.hlsearch = false
 opt.ignorecase = true
 opt.incsearch = true
